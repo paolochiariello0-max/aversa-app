@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aversa Visit & Smart Guide</title>
+  <title>Aversa Visit & TripAdvisor Live</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -11,8 +11,11 @@
     body { display: flex; flex-direction: column; height: 100vh; background: #f0f2f5; color: #1c1e21; }
     
     header { background: #003580; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
-    header h1 { font-size: 1.15rem; font-weight: 700; }
-    header button { background: #fff; color: #003580; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; }
+    
+    .header-btns { display: flex; gap: 8px; }
+    .btn-ta { background: #00af87; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-add { background: #fff; color: #003580; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
 
     .nav-tabs { display: flex; background: #ffffff; border-bottom: 1px solid #e4e6eb; z-index: 1000; }
     .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; color: #65676b; cursor: pointer; text-align: center; font-size: 0.9rem; }
@@ -44,7 +47,8 @@
     .modal-close { position: absolute; top: 12px; right: 16px; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: #555; }
     .modal-img { width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
 
-    /* Forms */
+    .btn-ta-link { display: inline-block; width: 100%; text-align: center; background: #00af87; color: white; padding: 10px; border-radius: 8px; font-weight: bold; text-decoration: none; margin-top: 10px; font-size: 0.9rem; }
+
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; }
     .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.85rem; }
@@ -54,8 +58,11 @@
 <body>
 
   <header>
-    <h1>📍 Aversa Visit & Commerce</h1>
-    <button onclick="openAddBusinessModal()">+ Aggiungi Attività</button>
+    <h1>📍 Aversa Visit</h1>
+    <div class="header-btns">
+      <a href="https://www.tripadvisor.it/Tourism-g804150-Aversa_Province_of_Caserta_Campania-Vacations.html" target="_blank" class="btn-ta">🦉 TripAdvisor Live</a>
+      <button class="btn-add" onclick="openAddBusinessModal()">+ Aggiungi</button>
+    </div>
   </header>
 
   <div class="nav-tabs">
@@ -75,7 +82,7 @@
         <button class="chip" onclick="filterCategory('Castelli e Palazzi', this)">Castelli e Palazzi</button>
         <button class="chip" onclick="filterCategory('Cultura e Parchi', this)">Cultura e Parchi</button>
         <button class="chip" onclick="filterCategory('Food & Ristorazione', this)">🍕 Food & Bar</button>
-        <button class="chip" onclick="filterCategory('Attività Private Non-Food', this)">🛍️ Shopping & Servizi</button>
+        <button class="chip" onclick="filterCategory('Attività Private Non-Food', this)">🛍️️ Shopping & Servizi</button>
       </div>
       <div class="poi-grid" id="poi-container"></div>
     </div>
@@ -90,15 +97,19 @@
       <h2 id="modal-title" style="margin: 8px 0;">Titolo</h2>
       <p id="modal-desc" style="color: #444; line-height: 1.5; font-size: 0.95rem;"></p>
 
+      <a id="modal-ta-link" class="btn-ta-link" href="https://www.tripadvisor.it/Tourism-g804150-Aversa_Province_of_Caserta_Campania-Vacations.html" target="_blank">
+        🦉 Vedi Recensioni & Foto Live su TripAdvisor
+      </a>
+
       <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #eee;">
-        <h4>📸 Contribuisci (Foto / Recensioni)</h4>
+        <h4>📸 Contribuisci (Foto / Recensioni Locali)</h4>
         <div class="form-group" style="margin-top:8px;">
           <input type="text" id="contrib-name" placeholder="Il tuo nome">
         </div>
         <div class="form-group">
           <textarea id="contrib-text" rows="2" placeholder="Scrivi una recensione o incolla l'URL di una nuova foto..."></textarea>
         </div>
-        <button class="btn-submit" onclick="submitContribution()">Invia Recensione / Foto</button>
+        <button class="btn-submit" onclick="submitContribution()">Invia Segnalazione</button>
         <div id="comments-container" style="margin-top:12px;"></div>
       </div>
     </div>
@@ -112,7 +123,7 @@
       
       <div class="form-group">
         <label>Nome Attività</label>
-        <input type="text" id="new-biz-name" placeholder="Es. Pizzeria Polipietra, Boutique Aversa...">
+        <input type="text" id="new-biz-name" placeholder="Es. Pizzeria, Boutique...">
       </div>
       <div class="form-group">
         <label>Tipologia</label>
@@ -139,7 +150,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // Database dei Monumenti e Attività Private ad Aversa
+    const TA_BASE_URL = "https://www.tripadvisor.it/Tourism-g804150-Aversa_Province_of_Caserta_Campania-Vacations.html";
+
     let poiData = [
       {
         id: 1,
@@ -191,7 +203,6 @@
       }
     ];
 
-    // Carica eventuali attività salvate localmente
     const savedBiz = JSON.parse(localStorage.getItem('aversa_custom_biz')) || [];
     poiData = poiData.concat(savedBiz);
 
@@ -267,6 +278,10 @@
       document.getElementById('modal-title').innerText = poi.title;
       document.getElementById('modal-desc').innerText = poi.desc;
       document.getElementById('modal-tag').innerText = poi.category;
+      
+      const taBtn = document.getElementById('modal-ta-link');
+      taBtn.href = TA_BASE_URL;
+
       document.getElementById('detail-modal').style.display = 'flex';
     }
 
