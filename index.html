@@ -3,56 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aversa Visit & Smart City</title>
+  <title>Aversa Visit Smart 3D</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { display: flex; flex-direction: column; height: 100vh; background: #f4f6f9; color: #333; }
+    body { display: flex; flex-direction: column; height: 100vh; background: #f0f2f5; color: #1c1e21; }
     
-    header { background: #003580; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; }
-    header h1 { font-size: 1.1rem; font-weight: 600; }
+    header { background: #003580; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
+    header h1 { font-size: 1.15rem; font-weight: 700; }
 
-    .nav-tabs { display: flex; background: #fff; border-bottom: 1px solid #ddd; z-index: 1000; }
-    .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; color: #666; cursor: pointer; text-align: center; }
+    .nav-tabs { display: flex; background: #ffffff; border-bottom: 1px solid #e4e6eb; z-index: 1000; }
+    .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; color: #65676b; cursor: pointer; text-align: center; font-size: 0.9rem; }
     .tab-btn.active { color: #003580; border-bottom: 3px solid #003580; }
 
     .content-area { flex: 1; position: relative; overflow: hidden; }
     #map-view, #list-view { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-    #list-view { display: none; overflow-y: auto; padding: 16px; background: #f4f6f9; }
+    #list-view { display: none; overflow-y: auto; padding: 16px; background: #f0f2f5; }
 
-    /* Filtri */
-    .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-    .chip { padding: 6px 14px; background: #e0e0e0; border-radius: 20px; font-size: 0.85rem; border: none; cursor: pointer; white-space: nowrap; }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+    .chip { padding: 6px 14px; background: #e4e6eb; border-radius: 20px; font-size: 0.85rem; border: none; cursor: pointer; white-space: nowrap; font-weight: 500; }
     .chip.active { background: #003580; color: white; }
 
-    /* Griglia Monumenti */
-    .poi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .poi-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s; }
-    .poi-card:active { transform: scale(0.98); }
-    .poi-card img { width: 100%; height: 160px; object-fit: cover; }
+    .poi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding-bottom: 40px; }
+    .poi-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    .poi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .poi-card img { width: 100%; height: 160px; object-fit: cover; background: #eee; }
     .poi-card-body { padding: 12px; }
-    .poi-card-body h3 { font-size: 1rem; color: #111; margin-bottom: 4px; }
-    .poi-card-body p { font-size: 0.85rem; color: #666; line-height: 1.3; }
+    .poi-card-body h3 { font-size: 1.05rem; color: #050505; margin-bottom: 4px; }
+    .poi-card-body p { font-size: 0.85rem; color: #65676b; line-height: 1.3; }
     .poi-tag { display: inline-block; margin-top: 8px; font-size: 0.75rem; background: #eef3fc; color: #003580; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
 
     /* Modal / Scheda Dettaglio */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end; }
-    .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative; animation: slideUp 0.3s ease-out; }
+    .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 20px 20px 0 0; max-height: 90vh; overflow-y: auto; padding: 20px; position: relative; animation: slideUp 0.3s ease-out; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .modal-close { position: absolute; top: 12px; right: 16px; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: #555; }
-    .modal-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+    .modal-img { width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+
+    /* Sezione Contributo Utente */
+    .user-contrib-box { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e4e6eb; }
+    .user-contrib-box h4 { font-size: 0.95rem; margin-bottom: 8px; color: #003580; }
+    .user-contrib-box input, .user-contrib-box textarea { width: 100%; padding: 8px 12px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.85rem; }
+    .btn-submit { background: #003580; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; }
+    .comments-list { margin-top: 12px; font-size: 0.85rem; color: #444; max-height: 120px; overflow-y: auto; }
+    .comment-item { background: #f7f8fa; padding: 8px; border-radius: 6px; margin-bottom: 6px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Aversa Visit 3D</h1>
+    <h1>📍 Aversa Visit 3D</h1>
   </header>
 
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('map')">🗺️ Mappa</button>
-    <button class="tab-btn" onclick="switchTab('list')">🏛️ Monumenti</button>
+    <button class="tab-btn active" onclick="switchTab('map')">🗺️ Mappa 3D</button>
+    <button class="tab-btn" onclick="switchTab('list')">🏛️ Elenco Monumenti</button>
   </div>
 
   <div class="content-area">
@@ -64,8 +70,8 @@
       <div class="filter-bar">
         <button class="chip active" onclick="filterCategory('all', this)">Tutti</button>
         <button class="chip" onclick="filterCategory('Chiese', this)">Chiese</button>
-        <button class="chip" onclick="filterCategory('Monumenti', this)">Monumenti</button>
-        <button class="chip" onclick="filterCategory('Cultura', this)">Cultura</button>
+        <button class="chip" onclick="filterCategory('Castelli e Palazzi', this)">Castelli e Palazzi</button>
+        <button class="chip" onclick="filterCategory('Cultura', this)">Cultura e Parchi</button>
       </div>
       <div class="poi-grid" id="poi-container"></div>
     </div>
@@ -79,46 +85,92 @@
       <span class="poi-tag" id="modal-tag">Categoria</span>
       <h2 id="modal-title" style="margin: 8px 0;">Titolo</h2>
       <p id="modal-desc" style="color: #444; line-height: 1.5; font-size: 0.95rem;"></p>
+
+      <!-- Sezione recensioni e invio foto/commenti -->
+      <div class="user-contrib-box">
+        <h4>📸 Aggiungi Foto o Commento</h4>
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Manca la foto o vuoi segnalare un aggiornamento per questo monumento?</p>
+        <input type="text" id="contrib-name" placeholder="Il tuo nome">
+        <textarea id="contrib-text" rows="2" placeholder="Scrivi una recensione o incolla l'URL di una nuova foto..."></textarea>
+        <button class="btn-submit" onclick="submitContribution()">Invia Segnalazione / Commento</button>
+        
+        <div class="comments-list" id="comments-container"></div>
+      </div>
     </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // Database dei Monumenti di Aversa
+    // Database Completo dei Monumenti di Aversa con Foto Reali Wikimedia
     const poiData = [
       {
         id: 1,
-        title: "Duomo di Aversa (Cattedrale di San Paolo)",
+        title: "Cattedrale di San Paolo (Duomo di Aversa)",
         category: "Chiese",
-        coords: [40.9754, 14.2039],
-        img: "https://images.unsplash.com/photo-1548625361-18159187313a?auto=format&fit=crop&w=600&q=80",
-        desc: "Splendida cattedrale romanica risalente al XI secolo, famosa per la sua cupola arabo-normanna e le opere d'arte custodite all'interno."
+        coords: [40.9763, 14.2027],
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Duomo_di_Aversa.JPG/640px-Duomo_di_Aversa.JPG",
+        desc: "Edificata nel XI secolo da Riccardo I, presenta una caratteristica cupola arabo-normanna e opere del Solimena all'interno."
       },
       {
         id: 2,
         title: "Castello Aragonese",
-        category: "Monumenti",
+        category: "Castelli e Palazzi",
         coords: [40.9731, 14.2062],
-        img: "https://images.unsplash.com/photo-1599946347371-68eb71b16afc?auto=format&fit=crop&w=600&q=80",
-        desc: "Imponente fortezza eretta nel XV secolo, simbolo del potere politico e militare della città durante la dominazione aragonese."
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Aversa_-_Castello_Aragonese_01.jpg/640px-Aversa_-_Castello_Aragonese_01.jpg",
+        desc: "Imponente fortezza fatta erigere nel XV secolo sotto il dominio aragonese, oggi sede del Tribunale di Napoli Nord."
       },
       {
         id: 3,
-        title: "Chiesa di San Francesco delle Monache",
+        title: "Chiesa di Santa Maria a Piazza",
         category: "Chiese",
-        coords: [40.9745, 14.2050],
-        img: "https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80",
-        desc: "Complesso monumentale di grande valore artistico e storico nel cuore del centro antico di Aversa."
+        coords: [40.9748, 14.2042],
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Santa_Maria_a_Piazza_Aversa.jpg/640px-Santa_Maria_a_Piazza_Aversa.jpg",
+        desc: "La chiesa più antica di Aversa (XI secolo), edificata in tufo con portali ogivali e affreschi di scuola giottesca."
       },
       {
         id: 4,
+        title: "Convento e Chiesa di San Francesco delle Monache",
+        category: "Chiese",
+        coords: [40.9745, 14.2050],
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/San_Francesco_delle_Monache_Aversa.jpg/640px-San_Francesco_delle_Monache_Aversa.jpg",
+        desc: "Fondata tra il 1230 e il 1235, ricca di marmi intarsiati, custodisce preziose opere di Ribera, Guercino e De Mura."
+      },
+      {
+        id: 5,
+        title: "Chiesa di Sant'Antonio da Padova",
+        category: "Chiese",
+        coords: [40.9751, 14.2061],
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Sant_Antonio_da_Padova_Aversa.jpg/640px-Sant_Antonio_da_Padova_Aversa.jpg",
+        desc: "Situata lungo via Seggio, risale al XIII secolo ed è un bellissimo esempio di architettura gotica francescana."
+      },
+      {
+        id: 6,
+        title: "Palazzo Golia",
+        category: "Castelli e Palazzi",
+        coords: [40.9738, 14.2055],
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Palazzo_Golia_Aversa.jpg/640px-Palazzo_Golia_Aversa.jpg",
+        desc: "Nobile palazzo storico rinascimentale, famoso per il suggestivo cortile interno con la statua della Campania Felix."
+      },
+      {
+        id: 7,
         title: "Teatro Cimarosa",
         category: "Cultura",
         coords: [40.9720, 14.2075],
-        img: "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=600&q=80",
-        desc: "Storico teatro intitolato al celebre compositore aversano Domenico Cimarosa, centro della vita culturale cittadina."
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Teatro_Cimarosa_Aversa.jpg/640px-Teatro_Cimarosa_Aversa.jpg",
+        desc: "Teatro storico intitolato al famoso compositore aversano Domenico Cimarosa, perno delle attività musicali e teatrali."
+      },
+      {
+        id: 8,
+        title: "Parco Salvino Arturo Pozzi",
+        category: "Cultura",
+        coords: [40.9698, 14.2102],
+        img: "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=600&q=80",
+        desc: "Il polmone verde principale della città di Aversa, area di relax e passeggiate per famiglie e sportivi."
       }
     ];
+
+    let currentPoiId = null;
+    let userComments = {};
 
     // Inizializzazione Mappa
     const map = L.map('map-view').setView([40.974, 14.205], 15);
@@ -127,7 +179,6 @@
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Render Iniziale
     let currentCategory = 'all';
 
     function renderMapMarkers() {
@@ -136,7 +187,7 @@
         marker.bindPopup(`
           <div style="text-align:center;">
             <b>${poi.title}</b><br>
-            <button onclick="openModal(${poi.id})" style="margin-top:6px; background:#003580; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Visualizza Scheda</button>
+            <button onclick="openModal(${poi.id})" style="margin-top:6px; background:#003580; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Visualizza Dettagli</button>
           </div>
         `);
       });
@@ -152,10 +203,10 @@
         card.className = 'poi-card';
         card.onclick = () => openModal(poi.id);
         card.innerHTML = `
-          <img src="${poi.img}" alt="${poi.title}" loading="lazy">
+          <img src="${poi.img}" alt="${poi.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x400?text=Foto+non+disponibile'">
           <div class="poi-card-body">
             <h3>${poi.title}</h3>
-            <p>${poi.desc.substring(0, 75)}...</p>
+            <p>${poi.desc.substring(0, 80)}...</p>
             <span class="poi-tag">${poi.category}</span>
           </div>
         `;
@@ -185,12 +236,16 @@
     }
 
     function openModal(id) {
+      currentPoiId = id;
       const poi = poiData.find(p => p.id === id);
       if(!poi) return;
+      
       document.getElementById('modal-img').src = poi.img;
       document.getElementById('modal-title').innerText = poi.title;
       document.getElementById('modal-desc').innerText = poi.desc;
       document.getElementById('modal-tag').innerText = poi.category;
+      
+      renderComments(id);
       document.getElementById('detail-modal').style.display = 'flex';
     }
 
@@ -198,12 +253,49 @@
       document.getElementById('detail-modal').style.display = 'none';
     }
 
-    // Registrazione Service Worker per PWA
+    function submitContribution() {
+      const name = document.getElementById('contrib-name').value.trim();
+      const text = document.getElementById('contrib-text').value.trim();
+
+      if(!name || !text) {
+        alert('Compila sia il nome che il messaggio per inviare la segnalazione.');
+        return;
+      }
+
+      if(!userComments[currentPoiId]) {
+        userComments[currentPoiId] = [];
+      }
+
+      userComments[currentPoiId].push({ name, text });
+      document.getElementById('contrib-name').value = '';
+      document.getElementById('contrib-text').value = '';
+
+      renderComments(currentPoiId);
+      alert('Grazie per il contributo! La tua segnalazione è stata aggiunta.');
+    }
+
+    function renderComments(id) {
+      const container = document.getElementById('comments-container');
+      container.innerHTML = '';
+      const list = userComments[id] || [];
+
+      if(list.length === 0) {
+        container.innerHTML = '<p style="font-size:0.8rem; color:#888;">Nessun commento inviato per questo monumento.</p>';
+        return;
+      }
+
+      list.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'comment-item';
+        item.innerHTML = `<b>${c.name}:</b> ${c.text}`;
+        container.appendChild(item);
+      });
+    }
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed', err));
     }
 
-    // Init
     renderMapMarkers();
     renderList();
   </script>
