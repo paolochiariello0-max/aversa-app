@@ -57,7 +57,7 @@
   <header>
     <h1>📍 Visit Aversa Direct</h1>
     <div class="header-btns">
-      <a href="https://www.tripadvisor.it/Tourism-g804150-Aversa_Province_of_Caserta_Campania-Vacations.html" target="_blank" class="btn-ta">🦉 TripAdvisor Live</a>
+      <a href="https://www.tripadvisor.it/Tourism-g804150-Aversa_Province_of_Caserta_Campania-Vacations.html" target="_blank" class="btn-ta">🦉 TripAdvisor Aversa</a>
     </div>
   </header>
 
@@ -68,7 +68,7 @@
 
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchView('attractions-view', this)">🏛️ Tutti i Luoghi</button>
-    <button class="tab-btn" onclick="switchView('map-view', this)">🗺️ Mappa Mappa Live</button>
+    <button class="tab-btn" onclick="switchView('map-view', this)">🗺️ Mappa Live</button>
   </div>
 
   <div class="content-area">
@@ -96,14 +96,13 @@
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <span id="modal-badge" class="poi-badge" style="margin-bottom:6px;"></span>
       <h2 id="modal-title" style="margin: 6px 0 10px 0;"></h2>
-      <p id="modal-desc" style="color: #444; line-height: 1.4; font-size: 0.9rem;"></p>
-      <a id="modal-ta-link" class="btn-ta-link" href="https://www.tripadvisor.it/Tourism-g804150-Aversa_Province_of_Caserta_Campania-Vacations.html" target="_blank">🦉 Apri Recensioni su TripAdvisor</a>
+      <p id="modal-desc" style="color: #444; line-height: 1.4; font-size: 0.9rem; margin-bottom: 12px;"></p>
+      <a id="modal-ta-link" class="btn-ta-link" href="#" target="_blank">🦉 Apri scheda specifica su TripAdvisor</a>
     </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const TA_BASE_URL = "https://www.tripadvisor.it/Tourism-g804150-Aversa_Province_of_Caserta_Campania-Vacations.html";
     let poiData = [];
 
     let map = L.map('map-view').setView([40.974, 14.205], 15);
@@ -174,7 +173,7 @@
       markersGroup.clearLayers();
       list.forEach(item => {
         const marker = L.marker([item.lat, item.lon]).addTo(markersGroup);
-        marker.bindPopup(`<b>${item.name}</b><br>📍 ${item.street}<br><br><button onclick="openModalById(${item.id})">Visualizza</button>`);
+        marker.bindPopup(`<b>${item.name}</b><br>📍 ${item.street}<br><br><button onclick="openModalById(${item.id})">Visualizza Dettaglio</button>`);
       });
     }
 
@@ -215,6 +214,13 @@
       document.getElementById('modal-title').innerText = item.name;
       document.getElementById('modal-desc').innerText = `Indirizzo: ${item.street}\nCoordinate: ${item.lat}, ${item.lon}`;
       document.getElementById('modal-badge').innerText = item.category.toUpperCase();
+
+      // Generazione dinamica dell'URL specifico di TripAdvisor per il luogo selezionato
+      const taDirectUrl = `https://www.tripadvisor.it/Search?q=${encodeURIComponent(item.name + ' Aversa')}`;
+      const taLinkElement = document.getElementById('modal-ta-link');
+      taLinkElement.href = taDirectUrl;
+      taLinkElement.innerText = `🦉 Cerca "${item.name}" su TripAdvisor`;
+
       document.getElementById('detail-modal').style.display = 'flex';
     }
 
@@ -239,7 +245,7 @@
       }
     }
 
-    // Inizializzazione con caricamento completo
+    // Inizializzazione con tutti i luoghi
     fetchOverpassData('all');
   </script>
 </body>
