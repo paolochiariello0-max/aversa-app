@@ -16,10 +16,9 @@
     .update-banner { display: none; background: #ff9800; color: #000; padding: 10px 16px; font-weight: bold; font-size: 0.85rem; justify-content: space-between; align-items: center; z-index: 3000; }
     .update-banner button { background: #000; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
 
-    /* Header con Foto Reale dell'Orologio dell'Annunziata */
-    header { background: #1f1f1f; color: #ffffff; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 1px solid #333; }
+    /* Header */
+    header { background: #1f1f1f; color: #ffffff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 1px solid #333; }
     header h1 { font-size: 1.1rem; font-weight: 700; color: #4fc3f7; display: flex; align-items: center; gap: 8px; }
-    .clock-img-logo { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #4fc3f7; }
     .user-profile { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
 
     /* Barra di Ricerca Live */
@@ -44,7 +43,7 @@
 
     .status-info { padding: 8px 16px; font-size: 0.8rem; color: #81d4fa; background: #0d47a1; text-align: center; font-weight: 500; }
 
-    .poi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 16px; }
+    .poi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 16px; min-height: 200px; }
     .poi-card { background: #242424; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid #333; cursor: pointer; padding: 14px; }
     .poi-card h3 { font-size: 0.95rem; margin-bottom: 6px; color: #fff; }
     .poi-card p { font-size: 0.82rem; color: #aaa; line-height: 1.3; }
@@ -91,9 +90,366 @@
   </div>
 
   <header>
-    <h1>
-      <img class="clock-img-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Arco_dell%27Annunziata_Aversa.jpg/640px-Arco_dell%27Annunziata_Aversa.jpg" alt="Orologio di Aversa">
-      Visit Aversa
-    </h1>
+    <h1>📍 Visit Aversa 🕰️</h1>
     <div class="user-profile">
       <div id="g_id_onload"
+           data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse">
+      </div>
+      <div class="g_id_signin" data-type="icon" data-shape="circle"></div>
+      <span id="user-name">Accedi</span>
+    </div>
+  </header>
+
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Cerca monumenti, scuole, B&B ad Aversa...">
+    <button onclick="searchLive()">Cerca</button>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchView('attractions-view', this)">🏛️ Luoghi Aversa</button>
+    <button class="tab-btn" onclick="switchView('map-wrapper', this)">🗺️ Mappa Interactive</button>
+    <button class="tab-btn" onclick="openReportModal()">📩 Segnalazioni</button>
+  </div>
+
+  <div class="content-area">
+    <!-- Vista Luoghi -->
+    <div id="attractions-view" class="view-panel active">
+      <div class="filter-bar">
+        <button class="chip active" onclick="loadCategory('all', this)">Tutti</button>
+        <button class="chip" onclick="loadCategory('transit', this)">🚄 Metro & Stazione</button>
+        <button class="chip" onclick="loadCategory('hotel', this)">🏨 Hotel & B&B</button>
+        <button class="chip" onclick="loadCategory('church', this)">⛪ Chiese & Culto</button>
+        <button class="chip" onclick="loadCategory('school', this)">🏫 Scuole & Università</button>
+        <button class="chip" onclick="loadCategory('food', this)">🍕 Ristoranti & Bar</button>
+        <button class="chip" onclick="loadCategory('historic', this)">🏛️ Monumenti</button>
+      </div>
+      <div class="status-info" id="status-text">Caricamento in corso per la città di Aversa...</div>
+      <div class="poi-grid" id="attractions-container"></div>
+    </div>
+
+    <!-- Vista Mappa -->
+    <div id="map-wrapper" class="view-panel">
+      <button class="map-toggle-btn" id="map-mode-btn" onclick="toggleMapMode()">🔄 Passa a Mappa 3D Satellitare</button>
+      <div id="map-view"></div>
+    </div>
+  </div>
+
+  <!-- Widget Assistente AI -->
+  <div class="ai-fab" onclick="toggleChat()">🤖</div>
+  <div class="chat-window" id="chat-window">
+    <div class="chat-header">
+      <span>🤖 Guida AI Aversa Smart</span>
+      <span style="cursor:pointer; font-size:1.2rem;" onclick="toggleChat()">&times;</span>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="msg msg-bot">
+        👋 Ciao! Sono l'Assistente AI della Città di Aversa.<br><br>
+        Chiedimi pure indicazioni su:<br>
+        • <b>Monumenti & Chiese</b> (Duomo, Arco e Orologio)<br>
+        • <b>Metropolitana & Stazione FS</b><br>
+        • <b>Dove mangiare</b> (Pizzerie e Polacca Aversana)<br>
+        • <b>Scuole, Università & B&B</b>
+      </div>
+    </div>
+    <div class="chat-footer">
+      <input type="text" id="chat-input" placeholder="Scrivi una domanda..." onkeypress="if(event.key==='Enter') sendAiMessage()">
+      <button onclick="sendAiMessage()">Invia</button>
+    </div>
+  </div>
+
+  <!-- Modal Dettaglio -->
+  <div class="modal" id="detail-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('detail-modal')">&times;</button>
+      <span id="modal-badge" class="poi-badge" style="margin-bottom:6px;"></span>
+      <h2 id="modal-title" style="margin: 6px 0 10px 0; color: #fff;"></h2>
+      <p id="modal-desc" style="color: #ccc; line-height: 1.4; font-size: 0.9rem; margin-bottom: 12px;"></p>
+      <a id="modal-google-link" style="display:block; text-align:center; background:#4285f4; color:white; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;" href="#" target="_blank">🔍 Apri Scheda Google Maps</a>
+    </div>
+  </div>
+
+  <!-- Modal Reclami & Segnalazioni -->
+  <div class="modal" id="report-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('report-modal')">&times;</button>
+      <h3 style="margin-bottom: 12px; color: #e53935;">📩 Invia Segnalazione / Reclamo</h3>
+      <p style="font-size:0.8rem; color:#aaa; margin-bottom:14px;">Invia un messaggio diretto all'amministrazione dell'app. L'email del destinatario resta totalmente anonima e protetta.</p>
+      <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST">
+        <div class="form-group">
+          <label>Nome / Oggetto</label>
+          <input type="text" name="subject" placeholder="Es. Segnalazione / Errore scheda" required>
+        </div>
+        <div class="form-group">
+          <label>La tua email</label>
+          <input type="email" name="email" placeholder="nome@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Messaggio</label>
+          <textarea name="message" rows="4" placeholder="Scrivi qui il tuo messaggio..." required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Invia Messaggio Riservato</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let poiData = [];
+    let is3D = false;
+    let newWorker;
+
+    // Inizializzazione Mappa
+    let map = L.map('map-view').setView([40.974, 14.205], 15);
+    const layer2D = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+    const layer3D = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+
+    layer2D.addTo(map);
+    let markersGroup = L.layerGroup().addTo(map);
+
+    const aversaBbox = "40.955,14.185,40.990,14.225";
+
+    // Service Worker per aggiornamenti
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        reg.addEventListener('updatefound', () => {
+          newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              document.getElementById('update-banner').style.display = 'flex';
+            }
+          });
+        });
+      }).catch(e => console.log(e));
+    }
+
+    function reloadApp() {
+      if (newWorker) newWorker.postMessage({ action: 'skipWaiting' });
+      window.location.reload();
+    }
+
+    function toggleMapMode() {
+      const mapEl = document.getElementById('map-view');
+      const btn = document.getElementById('map-mode-btn');
+
+      if (!is3D) {
+        map.removeLayer(layer2D);
+        layer3D.addTo(map);
+        mapEl.classList.add('view-3d');
+        btn.innerText = "🔄 Passa a Mappa 2D Standard";
+        is3D = true;
+      } else {
+        map.removeLayer(layer3D);
+        layer2D.addTo(map);
+        mapEl.classList.remove('view-3d');
+        btn.innerText = "🔄 Passa a Mappa 3D Satellitare";
+        is3D = false;
+      }
+      setTimeout(() => map.invalidateSize(), 300);
+    }
+
+    // Luoghi predefiniti di sicurezza (Fallback se Overpass è lento)
+    const fallbackPoi = [
+      { id: 1, name: "Arco dell'Annunziata e Torre dell'Orologio", category: "Monumenti", street: "Via Roma, Aversa", lat: 40.9712, lon: 14.2052 },
+      { id: 2, name: "Duomo di San Paolo (Cattedrale di Aversa)", category: "Chiese", street: "Piazza Duomo, Aversa", lat: 40.9763, lon: 14.2027 },
+      { id: 3, name: "Stazione Metropolitana Aversa Centro", category: "Stazione / Metro", street: "Via Raffaello, Aversa", lat: 40.9720, lon: 14.2080 },
+      { id: 4, name: "Stazione Metropolitana Aversa Ippodromo", category: "Stazione / Metro", street: "Via di Jasi, Aversa", lat: 40.9650, lon: 14.2120 },
+      { id: 5, name: "Stazione Ferroviaria FS Aversa", category: "Stazione / Metro", street: "Piazza Mazzini, Aversa", lat: 40.9705, lon: 14.2105 }
+    ];
+
+    async function fetchOverpassData(typeKey) {
+      document.getElementById('status-text').innerText = "Caricamento luoghi del comune di Aversa...";
+      let queryType = '';
+
+      if (typeKey === 'transit') {
+        queryType = 'node["railway"](' + aversaBbox + '); node["station"](' + aversaBbox + ');';
+      } else if (typeKey === 'hotel') {
+        queryType = 'node["tourism"~"hotel|guest_house|hostel|apartment|bed_and_breakfast"](' + aversaBbox + ');';
+      } else if (typeKey === 'church') {
+        queryType = 'node["amenity"="place_of_worship"](' + aversaBbox + ');';
+      } else if (typeKey === 'school') {
+        queryType = 'node["amenity"~"school|kindergarten|university|college"](' + aversaBbox + ');';
+      } else if (typeKey === 'food') {
+        queryType = 'node["amenity"~"restaurant|pizzeria|fast_food|cafe|pub"](' + aversaBbox + ');';
+      } else if (typeKey === 'historic') {
+        queryType = 'node["historic"](' + aversaBbox + ');';
+      } else {
+        queryType = 'node["amenity"](' + aversaBbox + '); node["historic"](' + aversaBbox + '); node["tourism"](' + aversaBbox + '); node["railway"](' + aversaBbox + ');';
+      }
+
+      const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];(${queryType});out 200;`;
+
+      try {
+        const res = await fetch(overpassUrl);
+        const data = await res.json();
+        
+        if (data && data.elements && data.elements.length > 0) {
+          poiData = data.elements.filter(e => e.tags && (e.tags.name || e.tags.railway)).map(e => ({
+            id: e.id,
+            name: e.tags.name || e.tags.railway || "Punto di Interesse",
+            category: e.tags.railway ? "Stazione / Metro" : (e.tags.tourism || e.tags.amenity || e.tags.historic || "Luogo"),
+            street: e.tags['addr:street'] ? (e.tags['addr:street'] + ' ' + (e.tags['addr:housenumber']||'')) : 'Aversa',
+            lat: e.lat,
+            lon: e.lon
+          }));
+        } else {
+          poiData = fallbackPoi;
+        }
+
+        document.getElementById('status-text').innerText = `Trovati ${poiData.length} luoghi ad Aversa.`;
+        renderList(poiData);
+        renderMap(poiData);
+      } catch (err) {
+        poiData = fallbackPoi;
+        document.getElementById('status-text').innerText = `Trovati ${poiData.length} luoghi principali ad Aversa.`;
+        renderList(poiData);
+        renderMap(poiData);
+      }
+    }
+
+    async function searchLive() {
+      const q = document.getElementById('search-input').value.trim();
+      if(!q) return;
+
+      document.getElementById('status-text').innerText = `Ricerca limitata ad Aversa per "${q}"...`;
+      const searchUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&viewbox=14.185,40.990,14.225,40.955&bounded=1&limit=30`;
+
+      try {
+        const res = await fetch(searchUrl);
+        const data = await res.json();
+        poiData = data.map(e => ({
+          id: e.place_id,
+          name: e.display_name.split(',')[0],
+          category: e.type || "Ricerca",
+          street: e.display_name,
+          lat: parseFloat(e.lat),
+          lon: parseFloat(e.lon)
+        }));
+
+        document.getElementById('status-text').innerText = `Risultati ad Aversa per "${q}": ${poiData.length} trovati.`;
+        renderList(poiData);
+        renderMap(poiData);
+      } catch (err) {
+        document.getElementById('status-text').innerText = "Errore durante la ricerca.";
+      }
+    }
+
+    function renderList(list) {
+      const container = document.getElementById('attractions-container');
+      container.innerHTML = '';
+      if(list.length === 0) {
+        container.innerHTML = '<p style="padding:20px; text-align:center; color:#aaa;">Nessun risultato trovato ad Aversa.</p>';
+        return;
+      }
+      list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'poi-card';
+        card.onclick = () => openModal(item);
+        card.innerHTML = `
+          <h3>${item.name}</h3>
+          <p>📍 ${item.street}</p>
+          <span class="poi-badge">${item.category.toUpperCase()}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderMap(list) {
+      markersGroup.clearLayers();
+      list.forEach(item => {
+        const marker = L.marker([item.lat, item.lon]).addTo(markersGroup);
+        marker.bindPopup(`<b>${item.name}</b><br>📍 ${item.street}<br><br><button onclick="openModalById(${item.id})">Visualizza Dettagli</button>`);
+      });
+    }
+
+    function loadCategory(catKey, btn) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      fetchOverpassData(catKey);
+    }
+
+    function openModal(item) {
+      document.getElementById('modal-title').innerText = item.name;
+      document.getElementById('modal-desc').innerText = `Indirizzo: ${item.street}\nCoordinate: ${item.lat}, ${item.lon}`;
+      document.getElementById('modal-badge').innerText = item.category.toUpperCase();
+      document.getElementById('modal-google-link').href = `https://www.google.com/search?q=${encodeURIComponent(item.name + ' Aversa')}`;
+      document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function openModalById(id) {
+      const item = poiData.find(p => p.id === id);
+      if(item) openModal(item);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function openReportModal() {
+      document.getElementById('report-modal').style.display = 'flex';
+    }
+
+    function switchView(viewId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+
+      if(viewId === 'map-wrapper') {
+        setTimeout(() => map.invalidateSize(), 250);
+      }
+    }
+
+    function toggleChat() {
+      const chat = document.getElementById('chat-window');
+      chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Chatbot AI Potenziato per Aversa
+    function sendAiMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if(!text) return;
+
+      const chatBody = document.getElementById('chat-body');
+      const userMsg = document.createElement('div');
+      userMsg.className = 'msg msg-user';
+      userMsg.innerText = text;
+      chatBody.appendChild(userMsg);
+      input.value = '';
+
+      setTimeout(() => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'msg msg-bot';
+        const lower = text.toLowerCase();
+        
+        if (lower.includes('orologio') || lower.includes('torre') || lower.includes('annunziata')) {
+          botMsg.innerHTML = "🕰️ <b>L'Arco e la Torre dell'Orologio dell'Annunziata</b> risalgono al XVI secolo. Rappresentano la porta monumentale e il simbolo storico principale di Aversa.";
+        } else if (lower.includes('duomo') || lower.includes('chiesa') || lower.includes('san paolo')) {
+          botMsg.innerHTML = "⛪ <b>Duomo di San Paolo (Cattedrale di Aversa)</b>: risale all'XI secolo, fondata dai Normanni. È famosa per la cupola arabo-normanna e il deambulatorio unico in Italia.";
+        } else if (lower.includes('metro') || lower.includes('metropolitana') || lower.includes('stazione') || lower.includes('treno')) {
+          botMsg.innerHTML = "🚄 <b>Trasporti ad Aversa:</b><br>• <b>Stazione FS Aversa</b> (Piazza Mazzini)<br>• <b>Metro Aversa Centro</b> (Linea Piscinola-Aversa)<br>• <b>Metro Aversa Ippodromo</b>";
+        } else if (lower.includes('polacca') || lower.includes('dolce') || lower.includes('mangiare') || lower.includes('pizzeria') || lower.includes('cibo')) {
+          botMsg.innerHTML = "🍕 <b>Enogastronomia Aversana:</b><br>• Assaggia la famosa <b>Polacca Aversana</b> (granita o brioche con crema e amarene, es. Pasticceria Mungiguerra).<br>• Mozzarella di Bufala DOP e Pizza a Canotto nelle pizzerie del centro storico.";
+        } else if (lower.includes('scuola') || lower.includes('universita') || lower.includes('architettura')) {
+          botMsg.innerHTML = "🏫 Aversa ospita il <b>Dipartimento di Architettura e Disegno Industriale</b> della Vanvitelli presso l'antico Monastero di San Lorenzo ad Septimum, oltre a numerosi licei e istituti storici.";
+        } else if (lower.includes('hotel') || lower.includes('b&b') || lower.includes('dormire')) {
+          botMsg.innerHTML = "🏨 Puoi filtrare e visualizzare tutti i B&B e Hotel di Aversa selezionando la scheda <b>🏨 Hotel & B&B</b> dal menu in alto!";
+        } else {
+          botMsg.innerHTML = "📍 Aversa è una città normanna ricca di oltre 100 chiese, storia e università! Usa la barra di ricerca o seleziona una categoria per trovare scuole, monumenti e ristoranti sulla mappa 3D.";
+        }
+
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 400);
+    }
+
+    function handleCredentialResponse(response) {
+      document.getElementById('user-name').innerText = "Account Connesso";
+    }
+
+    // Inizio
+    fetchOverpassData('all');
+  </script>
+</body>
+</html>
