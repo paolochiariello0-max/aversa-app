@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visit Aversa - Guida Ufficiale, Mappa & AI</title>
+  <title>Visit Aversa - Guida Ufficiale, Mappa 3D & AI Smart Guide</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <!-- SDK Google Sign-In -->
@@ -12,9 +12,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { display: flex; flex-direction: column; height: 100vh; background: #121212; color: #e0e0e0; }
 
-    /* Header */
-    header { background: #1f1f1f; color: #ffffff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 1px solid #333; }
-    header h1 { font-size: 1.1rem; font-weight: 700; color: #4fc3f7; }
+    /* Banner Notifica Aggiornamento App */
+    .update-banner { display: none; background: #ff9800; color: #000; padding: 10px 16px; font-weight: bold; font-size: 0.85rem; justify-content: space-between; align-items: center; z-index: 3000; }
+    .update-banner button { background: #000; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+
+    /* Header con Foto Reale dell'Orologio dell'Annunziata */
+    header { background: #1f1f1f; color: #ffffff; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 1px solid #333; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #4fc3f7; display: flex; align-items: center; gap: 8px; }
+    .clock-img-logo { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #4fc3f7; }
     .user-profile { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
 
     /* Barra di Ricerca Live */
@@ -58,17 +63,17 @@
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .modal-close { position: absolute; top: 12px; right: 16px; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: #aaa; }
 
-    /* Chatbot AI Widget */
-    .ai-fab { position: fixed; bottom: 20px; right: 20px; background: #0288d1; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; z-index: 1800; }
-    .chat-window { display: none; position: fixed; bottom: 85px; right: 20px; width: 320px; height: 420px; background: #1f1f1f; border: 1px solid #333; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.6); z-index: 1800; flex-direction: column; overflow: hidden; }
-    .chat-header { background: #0288d1; color: white; padding: 10px 14px; font-weight: bold; font-size: 0.9rem; display: flex; justify-content: space-between; }
-    .chat-body { flex: 1; padding: 12px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; }
-    .msg { padding: 8px 12px; border-radius: 12px; max-width: 85%; }
-    .msg-bot { background: #2e2e2e; color: #e0e0e0; align-self: flex-start; }
+    /* Chatbot AI Widget Avanzato */
+    .ai-fab { position: fixed; bottom: 20px; right: 20px; background: #0288d1; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; z-index: 1800; border: 2px solid #fff; }
+    .chat-window { display: none; position: fixed; bottom: 85px; right: 20px; width: 340px; height: 460px; background: #1f1f1f; border: 1px solid #333; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.6); z-index: 1800; flex-direction: column; overflow: hidden; }
+    .chat-header { background: #0288d1; color: white; padding: 10px 14px; font-weight: bold; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+    .chat-body { flex: 1; padding: 12px; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 10px; background: #181818; }
+    .msg { padding: 10px 12px; border-radius: 12px; max-width: 88%; line-height: 1.35; }
+    .msg-bot { background: #2b2b2b; color: #e0e0e0; align-self: flex-start; border: 1px solid #3c3c3c; }
     .msg-user { background: #0288d1; color: white; align-self: flex-end; }
-    .chat-footer { display: flex; padding: 8px; border-top: 1px solid #333; background: #181818; }
-    .chat-footer input { flex: 1; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 6px 10px; border-radius: 16px; font-size: 0.8rem; outline: none; }
-    .chat-footer button { background: #0288d1; color: white; border: none; padding: 6px 12px; border-radius: 16px; margin-left: 6px; font-size: 0.8rem; cursor: pointer; }
+    .chat-footer { display: flex; padding: 8px; border-top: 1px solid #333; background: #1f1f1f; }
+    .chat-footer input { flex: 1; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px 12px; border-radius: 16px; font-size: 0.8rem; outline: none; }
+    .chat-footer button { background: #0288d1; color: white; border: none; padding: 8px 14px; border-radius: 16px; margin-left: 6px; font-size: 0.8rem; cursor: pointer; font-weight: bold; }
 
     /* Form Reclami */
     .form-group { margin-bottom: 12px; }
@@ -79,331 +84,16 @@
 </head>
 <body>
 
+  <!-- Banner per l'aggiornamento dell'app -->
+  <div class="update-banner" id="update-banner">
+    <span>✨ Nuova versione disponibile per Aversa App!</span>
+    <button onclick="reloadApp()">🔄 Aggiorna Ora</button>
+  </div>
+
   <header>
-    <h1>📍 Visit Aversa App</h1>
+    <h1>
+      <img class="clock-img-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Arco_dell%27Annunziata_Aversa.jpg/640px-Arco_dell%27Annunziata_Aversa.jpg" alt="Orologio di Aversa">
+      Visit Aversa
+    </h1>
     <div class="user-profile">
       <div id="g_id_onload"
-           data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-           data-callback="handleCredentialResponse">
-      </div>
-      <div class="g_id_signin" data-type="icon" data-shape="circle"></div>
-      <span id="user-name">Accedi</span>
-    </div>
-  </header>
-
-  <div class="search-box">
-    <input type="text" id="search-input" placeholder="Cerca monumenti, scuole, B&B ad Aversa...">
-    <button onclick="searchLive()">Cerca</button>
-  </div>
-
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchView('attractions-view', this)">🏛️ Luoghi Aversa</button>
-    <button class="tab-btn" onclick="switchView('map-wrapper', this)">🗺️ Mappa Interactive</button>
-    <button class="tab-btn" onclick="openReportModal()">📩 Segnalazioni</button>
-  </div>
-
-  <div class="content-area">
-    <!-- Vista Luoghi -->
-    <div id="attractions-view" class="view-panel active">
-      <div class="filter-bar">
-        <button class="chip active" onclick="loadCategory('all', this)">Tutti</button>
-        <button class="chip" onclick="loadCategory('transit', this)">🚄 Metro & Stazione</button>
-        <button class="chip" onclick="loadCategory('hotel', this)">🏨 Hotel & B&B</button>
-        <button class="chip" onclick="loadCategory('church', this)">⛪ Chiese & Culto</button>
-        <button class="chip" onclick="loadCategory('school', this)">🏫 Scuole & Università</button>
-        <button class="chip" onclick="loadCategory('food', this)">🍕 Ristoranti & Bar</button>
-        <button class="chip" onclick="loadCategory('historic', this)">🏛️ Monumenti</button>
-      </div>
-      <div class="status-info" id="status-text">Caricamento in corso per la città di Aversa...</div>
-      <div class="poi-grid" id="attractions-container"></div>
-    </div>
-
-    <!-- Vista Mappa -->
-    <div id="map-wrapper" class="view-panel">
-      <button class="map-toggle-btn" id="map-mode-btn" onclick="toggleMapMode()">🔄 Passa a Mappa 3D</button>
-      <div id="map-view"></div>
-    </div>
-  </div>
-
-  <!-- Widget Assistente AI -->
-  <div class="ai-fab" onclick="toggleChat()">🤖</div>
-  <div class="chat-window" id="chat-window">
-    <div class="chat-header">
-      <span>Guida IA Aversa</span>
-      <span style="cursor:pointer;" onclick="toggleChat()">&times;</span>
-    </div>
-    <div class="chat-body" id="chat-body">
-      <div class="msg msg-bot">Ciao! Sono la tua guida virtuale di Aversa. Chiedimi informazioni sui monumenti, scuole, storia o su dove mangiare!</div>
-    </div>
-    <div class="chat-footer">
-      <input type="text" id="chat-input" placeholder="Chiedi alla guida..." onkeypress="if(event.key==='Enter') sendAiMessage()">
-      <button onclick="sendAiMessage()">Invia</button>
-    </div>
-  </div>
-
-  <!-- Modal Dettaglio -->
-  <div class="modal" id="detail-modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('detail-modal')">&times;</button>
-      <span id="modal-badge" class="poi-badge" style="margin-bottom:6px;"></span>
-      <h2 id="modal-title" style="margin: 6px 0 10px 0; color: #fff;"></h2>
-      <p id="modal-desc" style="color: #ccc; line-height: 1.4; font-size: 0.9rem; margin-bottom: 12px;"></p>
-      <a id="modal-google-link" style="display:block; text-align:center; background:#4285f4; color:white; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;" href="#" target="_blank">🔍 Apri Scheda Google Maps</a>
-    </div>
-  </div>
-
-  <!-- Modal Reclami & Segnalazioni -->
-  <div class="modal" id="report-modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('report-modal')">&times;</button>
-      <h3 style="margin-bottom: 12px; color: #e53935;">📩 Invia Segnalazione / Reclamo</h3>
-      <p style="font-size:0.8rem; color:#aaa; margin-bottom:14px;">Invia un messaggio diretto all'amministrazione dell'app. L'email del destinatario resta totalmente anonima e protetta.</p>
-      <!-- Sostituisci "YOUR_FORMSPREE_ENDPOINT" con il tuo ID endpoint gratuito Formspree -->
-      <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST">
-        <div class="form-group">
-          <label>Nome / Oggetto</label>
-          <input type="text" name="subject" placeholder="Es. Segnalazione buca / Errore scheda" required>
-        </div>
-        <div class="form-group">
-          <label>La tua email (per eventuale risposta)</label>
-          <input type="email" name="email" placeholder="nome@email.com" required>
-        </div>
-        <div class="form-group">
-          <label>Messaggio o Reclamo</label>
-          <textarea name="message" rows="4" placeholder="Scrivi qui il tuo messaggio..." required></textarea>
-        </div>
-        <button type="submit" class="btn-submit">Invia Messaggio Riservato</button>
-      </form>
-    </div>
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    let poiData = [];
-    let is3D = false;
-
-    // Inizializzazione Mappa Leaflet
-    let map = L.map('map-view').setView([40.974, 14.205], 15);
-    
-    // Layer 2D Standard
-    const layer2D = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
-    
-    // Layer 3D Satellitare
-    const layer3D = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
-
-    layer2D.addTo(map);
-    let markersGroup = L.layerGroup().addTo(map);
-
-    // Bounding Box rigida limitata ad Aversa (MinLat, MinLon, MaxLat, MaxLon)
-    const aversaBbox = "40.955,14.185,40.990,14.225";
-
-    function toggleMapMode() {
-      const mapEl = document.getElementById('map-view');
-      const btn = document.getElementById('map-mode-btn');
-
-      if (!is3D) {
-        map.removeLayer(layer2D);
-        layer3D.addTo(map);
-        mapEl.classList.add('view-3d');
-        btn.innerText = "🔄 Passa a Mappa 2D Standard";
-        is3D = true;
-      } else {
-        map.removeLayer(layer3D);
-        layer2D.addTo(map);
-        mapEl.classList.remove('view-3d');
-        btn.innerText = "🔄 Passa a Mappa 3D Satellitare";
-        is3D = false;
-      }
-      setTimeout(() => map.invalidateSize(), 300);
-    }
-
-    // Caricamento Dati OpenStreetMap
-    async function fetchOverpassData(typeKey) {
-      document.getElementById('status-text').innerText = "Caricamento luoghi del comune di Aversa...";
-      let queryType = '';
-
-      if (typeKey === 'transit') {
-        queryType = 'node["railway"](' + aversaBbox + '); node["station"](' + aversaBbox + ');';
-      } else if (typeKey === 'hotel') {
-        queryType = 'node["tourism"~"hotel|guest_house|hostel|apartment|bed_and_breakfast"](' + aversaBbox + ');';
-      } else if (typeKey === 'church') {
-        queryType = 'node["amenity"="place_of_worship"](' + aversaBbox + ');';
-      } else if (typeKey === 'school') {
-        queryType = 'node["amenity"~"school|kindergarten|university|college"](' + aversaBbox + ');';
-      } else if (typeKey === 'food') {
-        queryType = 'node["amenity"~"restaurant|pizzeria|fast_food|cafe|pub"](' + aversaBbox + ');';
-      } else if (typeKey === 'historic') {
-        queryType = 'node["historic"](' + aversaBbox + ');';
-      } else {
-        queryType = 'node["amenity"](' + aversaBbox + '); node["historic"](' + aversaBbox + '); node["tourism"](' + aversaBbox + '); node["railway"](' + aversaBbox + ');';
-      }
-
-      const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];(${queryType});out 200;`;
-
-      try {
-        const res = await fetch(overpassUrl);
-        const data = await res.json();
-        poiData = data.elements.filter(e => e.tags && (e.tags.name || e.tags.railway)).map(e => ({
-          id: e.id,
-          name: e.tags.name || e.tags.railway || "Punto di Interesse",
-          category: e.tags.railway ? "Stazione / Metro" : (e.tags.tourism || e.tags.amenity || e.tags.historic || "Luogo"),
-          street: e.tags['addr:street'] ? (e.tags['addr:street'] + ' ' + (e.tags['addr:housenumber']||'')) : 'Aversa',
-          lat: e.lat,
-          lon: e.lon
-        }));
-
-        document.getElementById('status-text').innerText = `Trovati ${poiData.length} luoghi ad Aversa.`;
-        renderList(poiData);
-        renderMap(poiData);
-      } catch (err) {
-        document.getElementById('status-text').innerText = "Impossibile recuperare i dati al momento.";
-      }
-    }
-
-    // Ricerca RIGIDAMENTE limitata ad Aversa
-    async function searchLive() {
-      const q = document.getElementById('search-input').value.trim();
-      if(!q) return;
-
-      document.getElementById('status-text').innerText = `Ricerca limitata ad Aversa per "${q}"...`;
-      // viewbox = left,top,right,bottom (14.185,40.990,14.225,40.955) & bounded=1 forza la ricerca dentro Aversa
-      const searchUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&viewbox=14.185,40.990,14.225,40.955&bounded=1&limit=30`;
-
-      try {
-        const res = await fetch(searchUrl);
-        const data = await res.json();
-        poiData = data.map(e => ({
-          id: e.place_id,
-          name: e.display_name.split(',')[0],
-          category: e.type || "Ricerca",
-          street: e.display_name,
-          lat: parseFloat(e.lat),
-          lon: parseFloat(e.lon)
-        }));
-
-        document.getElementById('status-text').innerText = `Risultati ad Aversa per "${q}": ${poiData.length} trovati.`;
-        renderList(poiData);
-        renderMap(poiData);
-      } catch (err) {
-        document.getElementById('status-text').innerText = "Errore durante la ricerca.";
-      }
-    }
-
-    function renderList(list) {
-      const container = document.getElementById('attractions-container');
-      container.innerHTML = '';
-      if(list.length === 0) {
-        container.innerHTML = '<p style="padding:20px; text-align:center; color:#aaa;">Nessun risultato trovato ad Aversa.</p>';
-        return;
-      }
-      list.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'poi-card';
-        card.onclick = () => openModal(item);
-        card.innerHTML = `
-          <h3>${item.name}</h3>
-          <p>📍 ${item.street}</p>
-          <span class="poi-badge">${item.category.toUpperCase()}</span>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function renderMap(list) {
-      markersGroup.clearLayers();
-      list.forEach(item => {
-        const marker = L.marker([item.lat, item.lon]).addTo(markersGroup);
-        marker.bindPopup(`<b>${item.name}</b><br>📍 ${item.street}<br><br><button onclick="openModalById(${item.id})">Visualizza Dettagli</button>`);
-      });
-    }
-
-    function loadCategory(catKey, btn) {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      if(btn) btn.classList.add('active');
-      fetchOverpassData(catKey);
-    }
-
-    function openModal(item) {
-      document.getElementById('modal-title').innerText = item.name;
-      document.getElementById('modal-desc').innerText = `Indirizzo: ${item.street}\nCoordinate: ${item.lat}, ${item.lon}`;
-      document.getElementById('modal-badge').innerText = item.category.toUpperCase();
-      document.getElementById('modal-google-link').href = `https://www.google.com/search?q=${encodeURIComponent(item.name + ' Aversa')}`;
-      document.getElementById('detail-modal').style.display = 'flex';
-    }
-
-    function openModalById(id) {
-      const item = poiData.find(p => p.id === id);
-      if(item) openModal(item);
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-    }
-
-    function openReportModal() {
-      document.getElementById('report-modal').style.display = 'flex';
-    }
-
-    function switchView(viewId, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
-
-      if(viewId === 'map-wrapper') {
-        setTimeout(() => map.invalidateSize(), 250);
-      }
-    }
-
-    // Logica Chatbot AI locale per Aversa
-    function toggleChat() {
-      const chat = document.getElementById('chat-window');
-      chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    function sendAiMessage() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if(!text) return;
-
-      const chatBody = document.getElementById('chat-body');
-      
-      // Messaggio Utente
-      const userMsg = document.createElement('div');
-      userMsg.className = 'msg msg-user';
-      userMsg.innerText = text;
-      chatBody.appendChild(userMsg);
-      input.value = '';
-
-      // Risposta IA automatica guidata su Aversa
-      setTimeout(() => {
-        const botMsg = document.createElement('div');
-        botMsg.className = 'msg msg-bot';
-        
-        const lower = text.toLowerCase();
-        if(lower.includes('duomo') || lower.includes('chiesa') || lower.includes('monumento')) {
-          botMsg.innerText = "Aversa è nota come la città delle 100 chiese! Ti consiglio di visitare il Duomo di San Paolo, la Pieve di San Giovanni e l'Arco dell'Annunziata.";
-        } else if(lower.includes('mangiare') || lower.includes('pizzeria') || lower.includes('dolce')) {
-          botMsg.innerText = "Ad Aversa devi assolutamente provare la Polacca Aversana (dolce tipico) e la mozzarella di bufala campana DOP in una delle pizzerie del centro!";
-        } else if(lower.includes('metro') || lower.includes('stazione') || lower.includes('treno')) {
-          botMsg.innerText = "Aversa dispone della Stazione FS e di due fermate della Metropolitana Linea NordEst: Aversa Centro e Aversa Ippodromo.";
-        } else {
-          botMsg.innerText = "Aversa è una città ricca di storia normanna, università e cultura! Puoi cercare scuole, monumenti e B&B usando le schede e la mappa dell'app.";
-        }
-
-        chatBody.appendChild(botMsg);
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }, 500);
-    }
-
-    // Gestione Google Login
-    function handleCredentialResponse(response) {
-      // Decodifica token Google basilare
-      document.getElementById('user-name').innerText = "Account Connesso";
-    }
-
-    // Caricamento Iniziale
-    fetchOverpassData('all');
-  </script>
-</body>
-</html>
