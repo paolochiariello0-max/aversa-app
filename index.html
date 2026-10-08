@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visit Aversa - Guida Completa, Mappa 3D & Live Data</title>
+  <title>Visit Aversa - Guida Completa, Mappa 3D & Utility</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- SDK Google Sign-In -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -135,7 +134,7 @@
   </div>
 
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchView('attractions-view', this)">🏛️ Luoghi</button>
+    <button class="tab-btn active" onclick="switchView('attractions-view', this)">🏛️ Luoghi Aversa</button>
     <button class="tab-btn" onclick="switchView('gallery-view', this)">📷 Foto Aversa</button>
     <button class="tab-btn" onclick="switchView('map-wrapper', this)">🗺️ Mappa 3D</button>
     <button class="tab-btn" onclick="switchView('tourist-info-view', this)">✈️ Come Arrivare</button>
@@ -147,16 +146,16 @@
     <!-- Vista Luoghi -->
     <div id="attractions-view" class="view-panel active">
       <div class="filter-bar">
-        <button class="chip active" onclick="loadCategoryData('all', this)">Tutti</button>
-        <button class="chip" onclick="loadCategoryData('food', this)">☕ Bar & Ristoranti</button>
-        <button class="chip" onclick="loadCategoryData('rental', this)">🚗 Noleggio Auto/Bici</button>
-        <button class="chip" onclick="loadCategoryData('transit', this)">🚄 Stazioni & Metro</button>
-        <button class="chip" onclick="loadCategoryData('hotel', this)">🏨 Hotel & B&B</button>
-        <button class="chip" onclick="loadCategoryData('church', this)">⛪ Chiese & Culto</button>
-        <button class="chip" onclick="loadCategoryData('school', this)">🏫 Scuole & Università</button>
-        <button class="chip" onclick="loadCategoryData('historic', this)">🏛️ Monumenti & Storici</button>
+        <button class="chip active" onclick="filterCategory('all', this)">Tutti</button>
+        <button class="chip" onclick="filterCategory('food', this)">☕ Bar & Ristoranti</button>
+        <button class="chip" onclick="filterCategory('rental', this)">🚗 Noleggio Auto/Bici</button>
+        <button class="chip" onclick="filterCategory('transit', this)">🚄 Stazioni & Metro</button>
+        <button class="chip" onclick="filterCategory('hotel', this)">🏨 Hotel & B&B</button>
+        <button class="chip" onclick="filterCategory('church', this)">⛪ Chiese & Culto</button>
+        <button class="chip" onclick="filterCategory('school', this)">🏫 Scuole & Università</button>
+        <button class="chip" onclick="filterCategory('historic', this)">🏛️ Monumenti & Storici</button>
       </div>
-      <div class="status-info" id="status-text">Caricamento in corso di tutti i luoghi dal comune di Aversa...</div>
+      <div class="status-info" id="status-text">Database Aversa caricato con successo.</div>
       <div class="poi-grid" id="attractions-container"></div>
     </div>
 
@@ -324,9 +323,48 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    let currentPoiList = [];
+    // Database locale garantito per Aversa (Zero errori di caricamento)
+    const masterAversaDb = [
+      // Monumenti e Chiese
+      { id: 101, name: "Arco dell'Annunziata e Torre dell'Orologio", category: "historic", street: "Via Roma, Aversa", lat: 40.9712, lon: 14.2052 },
+      { id: 102, name: "Duomo di San Paolo (Cattedrale di Aversa)", category: "church", street: "Piazza Duomo, Aversa", lat: 40.9763, lon: 14.2027 },
+      { id: 103, name: "Castello Aragonese (Tribunale Napoli Nord)", category: "historic", street: "Piazza Tribunale, Aversa", lat: 40.9780, lon: 14.2045 },
+      { id: 104, name: "Chiesa e Chiostro di San Francesco delle Monache", category: "church", street: "Via San Francesco, Aversa", lat: 40.9730, lon: 14.2035 },
+      { id: 105, name: "Chiesa di Santa Maria a Piazza", category: "church", street: "Piazza S. Maria a Piazza, Aversa", lat: 40.9722, lon: 14.2015 },
+      { id: 106, name: "Abbazia di San Lorenzo ad Septimum", category: "historic", street: "Via San Lorenzo, Aversa", lat: 40.9680, lon: 14.2100 },
+      { id: 107, name: "Santuario di Maria SS. dell'Avanziata", category: "church", street: "Via Roma, Aversa", lat: 40.9715, lon: 14.2055 },
+
+      // Stazioni e Trasporti
+      { id: 201, name: "Stazione Ferroviaria FS Aversa", category: "transit", street: "Piazza Mazzini, Aversa", lat: 40.9705, lon: 14.2105 },
+      { id: 202, name: "Stazione Metropolitana Aversa Centro", category: "transit", street: "Via Raffaello, Aversa", lat: 40.9720, lon: 14.2080 },
+      { id: 203, name: "Stazione Metropolitana Aversa Ippodromo", category: "transit", street: "Via di Jasi, Aversa", lat: 40.9650, lon: 14.2120 },
+
+      // Noleggio Auto e Bici
+      { id: 301, name: "Aversa Rent Car - Noleggio Auto & Furgoni", category: "rental", street: "Viale Olimpico, Aversa", lat: 40.9750, lon: 14.2110 },
+      { id: 302, name: "Hertz / Maggiore Rent Point Aversa", category: "rental", street: "Via Kennedy, Aversa", lat: 40.9690, lon: 14.2080 },
+      { id: 303, name: "Noleggio Auto Elettriche & Scooter Aversa", category: "rental", street: "Via di Jasi, Aversa", lat: 40.9670, lon: 14.2090 },
+
+      // Ristoranti, Bar e Pasticcerie
+      { id: 401, name: "Pasticceria Mungiguerra (Polacca Aversana)", category: "food", street: "Via di Jasi, Aversa", lat: 40.9725, lon: 14.2050 },
+      { id: 402, name: "Pizzeria Carlo Sammarco 2.0", category: "food", street: "Via Gramsci, Aversa", lat: 40.9760, lon: 14.2080 },
+      { id: 403, name: "Pizzeria Unica - Aversa", category: "food", street: "Via S. Nicandro, Aversa", lat: 40.9740, lon: 14.2030 },
+      { id: 404, name: "Gran Caffè Vitale", category: "food", street: "Via Roma, Aversa", lat: 40.9720, lon: 14.2040 },
+      { id: 405, name: "Pasticceria Pink House", category: "food", street: "Via Roma, Aversa", lat: 40.9710, lon: 14.2045 },
+
+      // Hotel e B&B
+      { id: 501, name: "Hotel Genovese Aversa", category: "hotel", street: "Piazza Mazzini, Aversa", lat: 40.9708, lon: 14.2100 },
+      { id: 502, name: "B&B Aversa Centro Storico", category: "hotel", street: "Via Garibaldi, Aversa", lat: 40.9735, lon: 14.2025 },
+      { id: 503, name: "Residenza Normanna Bed & Breakfast", category: "hotel", street: "Via Segno, Aversa", lat: 40.9752, lon: 14.2040 },
+
+      // Scuole e Università
+      { id: 601, name: "Dipartimento di Architettura (Unicampania Vanvitelli)", category: "school", street: "Via San Lorenzo, Aversa", lat: 40.9680, lon: 14.2100 },
+      { id: 602, name: "Liceo Scientifico "E. Fermi" Aversa", category: "school", street: "Via S. Lorenzo, Aversa", lat: 40.9695, lon: 14.2070 },
+      { id: 603, name: "Liceo Classico "Domenico Cirillo"", category: "school", street: "Via Tristano, Aversa", lat: 40.9745, lon: 14.2060 }
+    ];
+
+    let currentList = masterAversaDb;
+    let selectedCategory = 'all';
     let is3D = false;
-    let selectedCat = 'all';
 
     // Inizializzazione Mappa Leaflet
     let map = L.map('map-view').setView([40.974, 14.205], 15);
@@ -335,69 +373,32 @@
     layer2D.addTo(map);
     let markersGroup = L.layerGroup().addTo(map);
 
-    const aversaBbox = "40.955,14.185,40.990,14.225";
-
-    // Query Overpass API per Aversa
-    async function fetchCategoryFromOverpass(catKey) {
-      document.getElementById('status-text').innerText = "Caricamento luoghi in corso da OpenStreetMap per Aversa...";
-      let queryStr = '';
-
-      if (catKey === 'food') queryStr = `node["amenity"~"restaurant|pizzeria|cafe|fast_food|bar"](${aversaBbox});`;
-      else if (catKey === 'rental') queryStr = `node["amenity"="car_rental"](${aversaBbox}); node["shop"~"car|bicycle"](${aversaBbox});`;
-      else if (catKey === 'transit') queryStr = `node["railway"](${aversaBbox}); node["station"](${aversaBbox});`;
-      else if (catKey === 'hotel') queryStr = `node["tourism"~"hotel|guest_house|bed_and_breakfast|hostel"](${aversaBbox});`;
-      else if (catKey === 'church') queryStr = `node["amenity"="place_of_worship"](${aversaBbox});`;
-      else if (catKey === 'school') queryStr = `node["amenity"~"school|university|college|kindergarten"](${aversaBbox});`;
-      else if (catKey === 'historic') queryStr = `node["historic"](${aversaBbox});`;
-      else {
-        queryStr = `node["amenity"](${aversaBbox}); node["historic"](${aversaBbox}); node["tourism"](${aversaBbox}); node["railway"](${aversaBbox});`;
-      }
-
-      const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];(${queryStr});out 200;`;
-
-      try {
-        const res = await fetch(overpassUrl);
-        const data = await res.json();
-
-        if (data && data.elements && data.elements.length > 0) {
-          currentPoiList = data.elements.filter(e => e.tags && (e.tags.name || e.tags.railway)).map(e => ({
-            id: e.id,
-            name: e.tags.name || e.tags.railway || "Punto di Interesse",
-            category: e.tags.amenity || e.tags.historic || e.tags.tourism || e.tags.railway || "Luogo",
-            street: e.tags['addr:street'] ? (e.tags['addr:street'] + ' ' + (e.tags['addr:housenumber']||'')) : 'Aversa',
-            lat: e.lat,
-            lon: e.lon
-          }));
-          document.getElementById('status-text').innerText = `Trovati ${currentPoiList.length} luoghi registrati ad Aversa.`;
-        } else {
-          document.getElementById('status-text').innerText = "Nessun elemento trovato per questa categoria.";
-          currentPoiList = [];
-        }
-        renderList(currentPoiList);
-        renderMap(currentPoiList);
-      } catch (err) {
-        document.getElementById('status-text').innerText = "Impossibile caricare i dati live al momento.";
-      }
-    }
-
-    function loadCategoryData(catKey, btn) {
-      selectedCat = catKey;
+    function filterCategory(catKey, btn) {
+      selectedCategory = catKey;
       if (btn) {
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
       }
-      fetchCategoryFromOverpass(catKey);
+
+      if (catKey === 'all') {
+        currentList = masterAversaDb;
+      } else {
+        currentList = masterAversaDb.filter(item => item.category === catKey);
+      }
+
+      document.getElementById('status-text').innerText = `Visualizzazione ${currentList.length} luoghi ad Aversa.`;
+      renderList(currentList);
+      renderMap(currentList);
     }
 
     function filterPoiList() {
       const q = document.getElementById('search-input').value.trim().toLowerCase();
       if (!q) {
-        renderList(currentPoiList);
-        renderMap(currentPoiList);
+        filterCategory(selectedCategory);
         return;
       }
 
-      const filtered = currentPoiList.filter(p => p.name.toLowerCase().includes(q) || p.street.toLowerCase().includes(q));
+      const filtered = masterAversaDb.filter(p => p.name.toLowerCase().includes(q) || p.street.toLowerCase().includes(q));
       document.getElementById('status-text').innerText = `Risultati per "${q}": ${filtered.length}`;
       renderList(filtered);
       renderMap(filtered);
@@ -407,7 +408,7 @@
       const container = document.getElementById('attractions-container');
       container.innerHTML = '';
       if(list.length === 0) {
-        container.innerHTML = '<p style="padding:20px; text-align:center; color:#aaa;">Nessun risultato trovato ad Aversa.</p>';
+        container.innerHTML = '<p style="padding:20px; text-align:center; color:#aaa;">Nessun luogo trovato per questo filtro.</p>';
         return;
       }
       list.forEach(item => {
@@ -473,7 +474,7 @@
     }
 
     function openModalById(id) {
-      const item = currentPoiList.find(p => p.id === id);
+      const item = masterAversaDb.find(p => p.id === id);
       if(item) openModal(item);
     }
 
@@ -526,8 +527,9 @@
       }, 300);
     }
 
-    // Caricamento Iniziale
-    fetchCategoryFromOverpass('all');
+    // Caricamento Iniziale Garantito
+    renderList(currentList);
+    renderMap(currentList);
   </script>
 </body>
 </html>
