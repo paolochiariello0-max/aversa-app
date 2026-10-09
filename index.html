@@ -3,22 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visit Aversa - Guida Completa & Mappa 3D</title>
+  <title>Visit Aversa - Guida Ufficiale e Mappa 3D</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { display: flex; flex-direction: column; height: 100vh; background: #121212; color: #e0e0e0; }
 
-    /* Banner Notifica Aggiornamento App */
-    .update-banner { display: none; background: #ff9800; color: #000; padding: 10px 16px; font-weight: bold; font-size: 0.85rem; justify-content: space-between; align-items: center; z-index: 3000; }
-    .update-banner button { background: #000; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-
     /* Header */
-    header { background: #1f1f1f; color: #ffffff; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 1px solid #333; }
+    header { background: #1f1f1f; color: #ffffff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 1px solid #333; }
     header h1 { font-size: 1.05rem; font-weight: 700; color: #4fc3f7; display: flex; align-items: center; gap: 8px; }
-    .header-logo-img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid #4fc3f7; }
 
     /* Widget Meteo Header */
     .weather-widget-header { display: flex; align-items: center; gap: 6px; background: #2a2a2a; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem; cursor: pointer; border: 1px solid #444; }
@@ -33,12 +27,12 @@
     .tab-btn { flex: 1; padding: 10px 8px; border: none; background: none; font-weight: 600; color: #9e9e9e; cursor: pointer; text-align: center; font-size: 0.78rem; white-space: nowrap; }
     .tab-btn.active { color: #4fc3f7; border-bottom: 3px solid #4fc3f7; }
 
-    /* Panels */
+    /* Content Area */
     .content-area { flex: 1; position: relative; overflow: hidden; }
     .view-panel { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; overflow-y: auto; }
     .view-panel.active { display: block; }
 
-    /* Filter Bar & Chips */
+    /* Filter Bar */
     .filter-bar { display: flex; gap: 6px; padding: 10px 16px; background: #181818; border-bottom: 1px solid #2a2a2a; overflow-x: auto; }
     .chip { padding: 6px 14px; background: #2a2a2a; color: #ccc; border-radius: 16px; font-size: 0.8rem; border: 1px solid #3d3d3d; cursor: pointer; white-space: nowrap; font-weight: 500; }
     .chip.active { background: #0288d1; color: white; border-color: #0288d1; }
@@ -52,25 +46,24 @@
     .poi-card p { font-size: 0.82rem; color: #aaa; line-height: 1.3; }
     .poi-badge { display: inline-block; margin-top: 8px; font-size: 0.72rem; background: #003c8f; color: #80d8ff; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
 
-    /* Galleria Foto Iconiche */
+    /* Galleria Foto */
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding: 16px; }
-    .gallery-card { background: #242424; border-radius: 12px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: transform 0.2s; }
-    .gallery-card:hover { transform: scale(1.02); }
+    .gallery-card { background: #242424; border-radius: 12px; overflow: hidden; border: 1px solid #333; cursor: pointer; text-align: center; }
     .gallery-card img { width: 100%; height: 130px; object-fit: cover; background: #333; }
-    .gallery-card-caption { padding: 8px 10px; font-size: 0.8rem; font-weight: 600; color: #e0e0e0; text-align: center; }
+    .gallery-card-caption { padding: 8px; font-size: 0.8rem; font-weight: 600; color: #e0e0e0; }
 
-    /* Card Info Turistiche */
+    /* Info Cards */
     .info-card { background: #242424; padding: 16px; border-radius: 12px; border: 1px solid #333; margin-bottom: 14px; }
-    .info-card h3 { font-size: 1rem; color: #4fc3f7; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .info-card h3 { font-size: 1rem; color: #4fc3f7; margin-bottom: 6px; }
     .info-card p { font-size: 0.85rem; color: #ccc; line-height: 1.4; margin-bottom: 6px; }
     .info-card ul { padding-left: 20px; font-size: 0.83rem; color: #bbb; line-height: 1.5; }
 
-    /* Numeri Utili List */
+    /* Numeri Utili */
     .useful-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
     .useful-card { background: #242424; padding: 14px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
     .useful-card h3 { font-size: 0.95rem; color: #4fc3f7; margin-bottom: 4px; }
     .useful-card p { font-size: 0.82rem; color: #bbb; }
-    .btn-call { background: #2e7d32; color: white; border: none; padding: 8px 14px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.82rem; display: flex; align-items: center; gap: 4px; }
+    .btn-call { background: #2e7d32; color: white; border: none; padding: 8px 14px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.82rem; }
 
     /* Mappa Vista 2D/3D */
     #map-wrapper { width: 100%; height: 100%; position: relative; overflow: hidden; background: #0f172a; }
@@ -78,12 +71,12 @@
     #map-view.view-3d { transform: rotateX(30deg) scale(1.05); transform-origin: center bottom; }
     .map-toggle-btn { position: absolute; top: 12px; right: 12px; z-index: 1500; background: #1f1f1f; color: #fff; border: 1px solid #444; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
 
-    /* Modal Dettaglio & Meteo */
+    /* Modali */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: flex-end; }
     .modal-content { background: #222; color: #fff; width: 100%; max-width: 600px; border-radius: 16px 16px 0 0; max-height: 90vh; overflow-y: auto; padding: 20px; position: relative; border-top: 1px solid #444; }
     .modal-close { position: absolute; top: 12px; right: 16px; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: #aaa; }
 
-    /* Chatbot AI Widget */
+    /* Chatbot AI Floating Widget */
     .ai-fab { position: fixed; bottom: 20px; right: 20px; background: #0288d1; color: white; width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; z-index: 1800; border: 2px solid #fff; }
     .chat-window { display: none; position: fixed; bottom: 80px; right: 20px; width: 330px; height: 440px; background: #1f1f1f; border: 1px solid #333; border-radius: 16px; z-index: 1800; flex-direction: column; overflow: hidden; }
     .chat-header { background: #0288d1; color: white; padding: 10px 14px; font-weight: bold; font-size: 0.9rem; display: flex; justify-content: space-between; }
@@ -104,17 +97,8 @@
 </head>
 <body>
 
-  <div class="update-banner" id="update-banner">
-    <span>✨ Nuova versione disponibile per Aversa App!</span>
-    <button onclick="reloadApp()">🔄 Aggiorna Ora</button>
-  </div>
-
   <header>
-    <h1>
-      <img class="header-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Arco_dell%27Annunziata_Aversa.jpg/640px-Arco_dell%27Annunziata_Aversa.jpg" alt="Aversa Logo" onerror="this.src='https://via.placeholder.com/30?text=AV'">
-      Visit Aversa
-    </h1>
-    
+    <h1>📍 Visit Aversa 🕰️</h1>
     <div class="weather-widget-header" onclick="openWeatherModal()">
       <span>☁️ Aversa</span>
       <strong id="header-temp">19°C</strong>
@@ -122,7 +106,7 @@
   </header>
 
   <div class="search-box">
-    <input type="text" id="search-input" placeholder="Cerca tra le centinaia di luoghi ad Aversa..." onkeyup="filterPoiList()">
+    <input type="text" id="search-input" placeholder="Cerca tra i luoghi di Aversa..." onkeyup="filterPoiList()">
     <button onclick="filterPoiList()">Cerca</button>
   </div>
 
@@ -148,11 +132,11 @@
         <button class="chip" onclick="filterCategory('school', this)">🏫 Scuole & Università</button>
         <button class="chip" onclick="filterCategory('historic', this)">🏛️ Monumenti & Storici</button>
       </div>
-      <div class="status-info" id="status-text">Database Aversa caricato con successo.</div>
+      <div class="status-info" id="status-text">Caricamento luoghi Aversa...</div>
       <div class="poi-grid" id="attractions-container"></div>
     </div>
 
-    <!-- Vista Galleria Foto Iconiche -->
+    <!-- Vista Galleria Foto -->
     <div id="gallery-view" class="view-panel">
       <div class="gallery-grid">
         <div class="gallery-card" onclick="viewFullPhoto('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Arco_dell%27Annunziata_Aversa.jpg/800px-Arco_dell%27Annunziata_Aversa.jpg', 'Arco dell\'Annunziata e Torre dell\'Orologio')">
@@ -163,4 +147,340 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Duomo_di_Aversa.JPG/640px-Duomo_di_Aversa.JPG" alt="Duomo di Aversa">
           <div class="gallery-card-caption">Duomo di San Paolo</div>
         </div>
-        <div class="gallery-card" onclick="viewFullPhoto('
+        <div class="gallery-card" onclick="viewFullPhoto('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Aversa_-_Castello_Aragonese_01.jpg/800px-Aversa_-_Castello_Aragonese_01.jpg', 'Castello Aragonese')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Aversa_-_Castello_Aragonese_01.jpg/640px-Aversa_-_Castello_Aragonese_01.jpg" alt="Castello Aragonese">
+          <div class="gallery-card-caption">Castello Aragonese</div>
+        </div>
+        <div class="gallery-card" onclick="viewFullPhoto('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/San_Francesco_delle_Monache_Aversa.jpg/800px-San_Francesco_delle_Monache_Aversa.jpg', 'San Francesco delle Monache')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/San_Francesco_delle_Monache_Aversa.jpg/640px-San_Francesco_delle_Monache_Aversa.jpg" alt="San Francesco">
+          <div class="gallery-card-caption">San Francesco Monache</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista Mappa -->
+    <div id="map-wrapper" class="view-panel">
+      <button class="map-toggle-btn" id="map-mode-btn" onclick="toggleMapMode()">🔄 Passa a Mappa 3D Satellitare</button>
+      <div id="map-view"></div>
+    </div>
+
+    <!-- Vista Info Turistiche -->
+    <div id="tourist-info-view" class="view-panel" style="padding:16px;">
+      <div class="info-card">
+        <h3>✈️ Dall'Aeroporto di Napoli Capodichino (NAP) ad Aversa</h3>
+        <p>L'Aeroporto Internazionale di Capodichino dista circa 16 km da Aversa:</p>
+        <ul>
+          <li><b>Navetta Alibus / Bus + Treno:</b> Prendi l'Alibus fino alla Stazione di Napoli Centrale e prosegui con il treno regionale per Aversa (15 min).</li>
+          <li><b>Taxi o Noleggio Auto / NCC:</b> Imbocca l'Asse Mediano (SS7bis) uscita Aversa Nord / Aversa Sud (circa 20 minuti).</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>🚆 Dalla Stazione di Napoli Centrale (Piazza Garibaldi)</h3>
+        <p>Aversa è collegata con treni frequenti ogni 15-20 minuti:</p>
+        <ul>
+          <li><b>Treni Regionali Trenitalia:</b> Collegamento diretto Napoli Centrale ➔ Aversa in circa 15 minuti.</li>
+          <li><b>Metropolitana Linea NordEst (EAV):</b> Da Napoli Piscinola con fermate dirette <i>Aversa Ippodromo</i> e <i>Aversa Centro</i>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Vista Numeri Utili -->
+    <div id="useful-view" class="view-panel">
+      <div class="useful-list">
+        <div class="useful-card">
+          <div>
+            <h3>🚨 Emergenze Generali</h3>
+            <p>Numero Unico Europeo per emergenze</p>
+          </div>
+          <a class="btn-call" href="tel:112">📞 112</a>
+        </div>
+        <div class="useful-card">
+          <div>
+            <h3>🚓 Polizia Municipale di Aversa</h3>
+            <p>Via San Lorenzo, 19 - Comando Locale</p>
+          </div>
+          <a class="btn-call" href="tel:0819791611">📞 081 9791611</a>
+        </div>
+        <div class="useful-card">
+          <div>
+            <h3>🏥 Ospedale G. Moscati & Pronto Soccorso</h3>
+            <p>Via Gramsci - Presidio Ospedaliero Aversa</p>
+          </div>
+          <a class="btn-call" href="tel:0818901654">📞 081 8901654</a>
+        </div>
+        <div class="useful-card">
+          <div>
+            <h3>🚔 Carabinieri Compagnia Aversa</h3>
+            <p>Viale degli Artisti - Aversa</p>
+          </div>
+          <a class="btn-call" href="tel:0818902280">📞 081 8902280</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Widget Assistente AI -->
+  <div class="ai-fab" onclick="toggleChat()">🤖</div>
+  <div class="chat-window" id="chat-window">
+    <div class="chat-header">
+      <span>🤖 Guida AI Aversa Smart</span>
+      <span style="cursor:pointer;" onclick="toggleChat()">&times;</span>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="msg msg-bot">Ciao! Sono la tua guida virtuale di Aversa. Chiedimi indicazioni su monumenti, scuole, B&B o come arrivare dall'aeroporto!</div>
+    </div>
+    <div class="chat-footer">
+      <input type="text" id="chat-input" placeholder="Scrivi una domanda..." onkeypress="if(event.key==='Enter') sendAiMessage()">
+      <button onclick="sendAiMessage()">Invia</button>
+    </div>
+  </div>
+
+  <!-- Modal Dettaglio -->
+  <div class="modal" id="detail-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('detail-modal')">&times;</button>
+      <img id="modal-img-full" src="" alt="Foto" style="width:100%; border-radius:12px; margin-bottom:12px; display:none;">
+      <span id="modal-badge" class="poi-badge" style="margin-bottom:6px;"></span>
+      <h2 id="modal-title" style="margin: 6px 0 10px 0; color: #fff;"></h2>
+      <p id="modal-desc" style="color: #ccc; line-height: 1.4; font-size: 0.9rem; margin-bottom: 12px;"></p>
+      <a id="modal-google-link" style="display:block; text-align:center; background:#4285f4; color:white; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;" href="#" target="_blank">🔍 Apri Scheda Google Maps</a>
+    </div>
+  </div>
+
+  <!-- Modal Meteo -->
+  <div class="modal" id="weather-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('weather-modal')">&times;</button>
+      <h2 style="color:#4fc3f7; margin-bottom:6px;">🌤️ Meteo Aversa Live</h2>
+      <p style="font-size:0.85rem; color:#aaa;">Previsioni correnti per la città di Aversa (CE)</p>
+      <div style="background:#2b2b2b; padding:16px; border-radius:12px; margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-size:2rem; font-weight:bold; color:#fff;">19°C</span>
+          <p style="font-size:0.8rem; color:#bbb;">Percepita: 24°C | Coperto</p>
+        </div>
+        <div style="text-align:right; font-size:0.8rem; color:#aaa;">
+          <p>💧 Umidità: 93%</p>
+          <p>💨 Vento: 3 km/h Est</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Segnalazioni -->
+  <div class="modal" id="report-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('report-modal')">&times;</button>
+      <h3 style="margin-bottom: 12px; color: #e53935;">📩 Invia Segnalazione / Reclamo</h3>
+      <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST">
+        <div class="form-group">
+          <label>Nome / Oggetto</label>
+          <input type="text" name="subject" placeholder="Es. Segnalazione buca / Errore scheda" required>
+        </div>
+        <div class="form-group">
+          <label>La tua email</label>
+          <input type="email" name="email" placeholder="nome@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Messaggio</label>
+          <textarea name="message" rows="4" placeholder="Scrivi qui il tuo messaggio..." required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Invia Messaggio Riservato</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Database Garantito di Aversa
+    var masterAversaDb = [
+      { id: 101, name: "Arco dell'Annunziata e Torre dell'Orologio", category: "historic", street: "Via Roma, Aversa", lat: 40.9712, lon: 14.2052 },
+      { id: 102, name: "Duomo di San Paolo (Cattedrale di Aversa)", category: "church", street: "Piazza Duomo, Aversa", lat: 40.9763, lon: 14.2027 },
+      { id: 103, name: "Castello Aragonese (Tribunale Napoli Nord)", category: "historic", street: "Piazza Tribunale, Aversa", lat: 40.9780, lon: 14.2045 },
+      { id: 104, name: "Chiesa e Chiostro di San Francesco delle Monache", category: "church", street: "Via San Francesco, Aversa", lat: 40.9730, lon: 14.2035 },
+      { id: 105, name: "Chiesa di Santa Maria a Piazza", category: "church", street: "Piazza S. Maria a Piazza, Aversa", lat: 40.9722, lon: 14.2015 },
+      { id: 106, name: "Abbazia di San Lorenzo ad Septimum", category: "historic", street: "Via San Lorenzo, Aversa", lat: 40.9680, lon: 14.2100 },
+      { id: 201, name: "Stazione Ferroviaria FS Aversa", category: "transit", street: "Piazza Mazzini, Aversa", lat: 40.9705, lon: 14.2105 },
+      { id: 202, name: "Stazione Metropolitana Aversa Centro", category: "transit", street: "Via Raffaello, Aversa", lat: 40.9720, lon: 14.2080 },
+      { id: 203, name: "Stazione Metropolitana Aversa Ippodromo", category: "transit", street: "Via di Jasi, Aversa", lat: 40.9650, lon: 14.2120 },
+      { id: 301, name: "Aversa Rent Car - Noleggio Auto e Furgoni", category: "rental", street: "Viale Olimpico, Aversa", lat: 40.9750, lon: 14.2110 },
+      { id: 302, name: "Hertz Rent Point Aversa", category: "rental", street: "Via Kennedy, Aversa", lat: 40.9690, lon: 14.2080 },
+      { id: 401, name: "Pasticceria Mungiguerra (Polacca Aversana)", category: "food", street: "Via di Jasi, Aversa", lat: 40.9725, lon: 14.2050 },
+      { id: 402, name: "Pizzeria Carlo Sammarco 2.0", category: "food", street: "Via Gramsci, Aversa", lat: 40.9760, lon: 14.2080 },
+      { id: 403, name: "Gran Caffe Vitale", category: "food", street: "Via Roma, Aversa", lat: 40.9720, lon: 14.2040 },
+      { id: 501, name: "Hotel Genovese Aversa", category: "hotel", street: "Piazza Mazzini, Aversa", lat: 40.9708, lon: 14.2100 },
+      { id: 502, name: "B&B Aversa Centro Storico", category: "hotel", street: "Via Garibaldi, Aversa", lat: 40.9735, lon: 14.2025 },
+      { id: 601, name: "Dipartimento di Architettura Unicampania", category: "school", street: "Via San Lorenzo, Aversa", lat: 40.9680, lon: 14.2100 },
+      { id: 602, name: "Liceo Scientifico Enrico Fermi", category: "school", street: "Via S. Lorenzo, Aversa", lat: 40.9695, lon: 14.2070 },
+      { id: 603, name: "Liceo Classico Domenico Cirillo", category: "school", street: "Via Tristano, Aversa", lat: 40.9745, lon: 14.2060 }
+    ];
+
+    var currentList = masterAversaDb;
+    var selectedCategory = 'all';
+    var is3D = false;
+
+    // Inizializzazione Mappa
+    var map = L.map('map-view').setView([40.974, 14.205], 15);
+    var layer2D = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+    var layer3D = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+    layer2D.addTo(map);
+    var markersGroup = L.layerGroup().addTo(map);
+
+    function filterCategory(catKey, btn) {
+      selectedCategory = catKey;
+      if (btn) {
+        document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+        btn.classList.add('active');
+      }
+
+      if (catKey === 'all') {
+        currentList = masterAversaDb;
+      } else {
+        currentList = masterAversaDb.filter(function(item) { return item.category === catKey; });
+      }
+
+      document.getElementById('status-text').innerText = "Visualizzazione " + currentList.length + " luoghi ad Aversa.";
+      renderList(currentList);
+      renderMap(currentList);
+    }
+
+    function filterPoiList() {
+      var q = document.getElementById('search-input').value.trim().toLowerCase();
+      if (!q) {
+        filterCategory(selectedCategory);
+        return;
+      }
+
+      var filtered = masterAversaDb.filter(function(p) {
+        return p.name.toLowerCase().indexOf(q) !== -1 || p.street.toLowerCase().indexOf(q) !== -1;
+      });
+      document.getElementById('status-text').innerText = "Risultati per \"" + q + "\": " + filtered.length;
+      renderList(filtered);
+      renderMap(filtered);
+    }
+
+    function renderList(list) {
+      var container = document.getElementById('attractions-container');
+      container.innerHTML = '';
+      if (list.length === 0) {
+        container.innerHTML = '<p style="padding:20px; text-align:center; color:#aaa;">Nessun luogo trovato per questo filtro.</p>';
+        return;
+      }
+      list.forEach(function(item) {
+        var card = document.createElement('div');
+        card.className = 'poi-card';
+        card.onclick = function() { openModal(item); };
+        card.innerHTML = '<h3>' + item.name + '</h3><p>📍 ' + item.street + '</p><span class="poi-badge">' + item.category.toUpperCase() + '</span>';
+        container.appendChild(card);
+      });
+    }
+
+    function renderMap(list) {
+      markersGroup.clearLayers();
+      list.forEach(function(item) {
+        var marker = L.marker([item.lat, item.lon]).addTo(markersGroup);
+        marker.bindPopup('<b>' + item.name + '</b><br>📍 ' + item.street + '<br><br><button onclick="openModalById(' + item.id + ')">Visualizza Scheda</button>');
+      });
+    }
+
+    function toggleMapMode() {
+      var mapEl = document.getElementById('map-view');
+      var btn = document.getElementById('map-mode-btn');
+
+      if (!is3D) {
+        map.removeLayer(layer2D);
+        layer3D.addTo(map);
+        mapEl.classList.add('view-3d');
+        btn.innerText = "🔄 Passa a Mappa 2D Standard";
+        is3D = true;
+      } else {
+        map.removeLayer(layer3D);
+        layer2D.addTo(map);
+        mapEl.classList.remove('view-3d');
+        btn.innerText = "🔄 Passa a Mappa 3D Satellitare";
+        is3D = false;
+      }
+      setTimeout(function() { map.invalidateSize(); }, 300);
+    }
+
+    function openModal(item) {
+      document.getElementById('modal-img-full').style.display = 'none';
+      document.getElementById('modal-google-link').style.display = 'block';
+      document.getElementById('modal-title').innerText = item.name;
+      document.getElementById('modal-desc').innerText = "Indirizzo: " + item.street + "\nCoordinate: " + item.lat + ", " + item.lon;
+      document.getElementById('modal-badge').innerText = item.category.toUpperCase();
+      document.getElementById('modal-google-link').href = "https://www.google.com/search?q=" + encodeURIComponent(item.name + " Aversa");
+      document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function viewFullPhoto(url, title) {
+      var img = document.getElementById('modal-img-full');
+      img.src = url;
+      img.style.display = 'block';
+      document.getElementById('modal-google-link').style.display = 'none';
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-desc').innerText = "Foto reale iconica della città di Aversa (CE).";
+      document.getElementById('modal-badge').innerText = "FOTO ICONICA";
+      document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function openModalById(id) {
+      var item = masterAversaDb.find(function(p) { return p.id === id; });
+      if(item) openModal(item);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function openWeatherModal() {
+      document.getElementById('weather-modal').style.display = 'flex';
+    }
+
+    function openReportModal() {
+      document.getElementById('report-modal').style.display = 'flex';
+    }
+
+    function switchView(viewId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.view-panel').forEach(function(v) { v.classList.remove('active'); });
+      document.getElementById(viewId).classList.add('active');
+
+      if(viewId === 'map-wrapper') {
+        setTimeout(function() { map.invalidateSize(); }, 250);
+      }
+    }
+
+    function toggleChat() {
+      var chat = document.getElementById('chat-window');
+      chat.style.display = (chat.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function sendAiMessage() {
+      var input = document.getElementById('chat-input');
+      var text = input.value.trim();
+      if(!text) return;
+
+      var chatBody = document.getElementById('chat-body');
+      var userMsg = document.createElement('div');
+      userMsg.className = 'msg msg-user';
+      userMsg.innerText = text;
+      chatBody.appendChild(userMsg);
+      input.value = '';
+
+      setTimeout(function() {
+        var botMsg = document.createElement('div');
+        botMsg.className = 'msg msg-bot';
+        botMsg.innerHTML = "📍 Aversa è una città normanna ricca di oltre 100 chiese, università e luoghi d'interesse! Puoi esplorare la mappa 3D o selezionare una categoria dal menu.";
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 300);
+    }
+
+    // Caricamento Iniziale Garantito
+    renderList(currentList);
+    renderMap(currentList);
+  </script>
+</body>
+</html>
