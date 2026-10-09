@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visit Aversa - Guida Ufficiale e Luoghi</title>
+  <title>Visit Aversa - Guida Ufficiale</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #121212; color: #ffffff; padding-bottom: 40px; }
@@ -56,7 +56,7 @@
   </header>
 
   <div class="search-area">
-    <input type="text" id="search-input" placeholder="Cerca tra tutte le attività, strade, scuole..." onkeyup="filterPlaces()">
+    <input type="text" id="search-input" placeholder="Cerca bar, pizzerie, scuole, monumenti..." onkeyup="filterPlaces()">
   </div>
 
   <div class="tabs-bar">
@@ -161,12 +161,10 @@
   </div>
 
   <script>
-    // Database completo esteso di Aversa con centinaia di strade, negozi e luoghi
     var masterAversaPlaces = [
-      // Monumenti e Chiese Storiche
       { name: "Arco dell'Annunziata e Torre dell'Orologio", category: "historic", street: "Via Roma, Aversa" },
       { name: "Duomo di San Paolo (Cattedrale Normanna)", category: "church", street: "Piazza Duomo, Aversa" },
-      { name: "Castello Aragonese (Sede Tribunale Napoli Nord)", category: "historic", street: "Piazza Tribunale, Aversa" },
+      { name: "Castello Aragonese (Tribunale Napoli Nord)", category: "historic", street: "Piazza Tribunale, Aversa" },
       { name: "Chiesa e Chiostro di San Francesco delle Monache", category: "church", street: "Via San Francesco, Aversa" },
       { name: "Chiesa di Santa Maria a Piazza (Anno 1030)", category: "church", street: "Piazza S. Maria a Piazza, Aversa" },
       { name: "Abbazia di San Lorenzo ad Septimum", category: "historic", street: "Via San Lorenzo, Aversa" },
@@ -180,22 +178,16 @@
       { name: "Palazzo Bisceglia", category: "historic", street: "Via S. Biagio, Aversa" },
       { name: "Palazzo Golia", category: "historic", street: "Via Segno, Aversa" },
       { name: "Palazzo Parente", category: "historic", street: "Via Roma, Aversa" },
-
-      // Stazioni e Trasporti
       { name: "Stazione Ferroviaria FS di Aversa", category: "transit", street: "Piazza Mazzini, Aversa" },
       { name: "Stazione Metropolitana Aversa Centro", category: "transit", street: "Via Raffaello, Aversa" },
       { name: "Stazione Metropolitana Aversa Ippodromo", category: "transit", street: "Via di Jasi, Aversa" },
       { name: "Terminal Bus Extraurbani Aversa Stazione", category: "transit", street: "Piazza Mazzini, Aversa" },
       { name: "Parcheggio Pubblico Stazione Aversa", category: "transit", street: "Piazza Mazzini, Aversa" },
-
-      // Noleggio Auto e Bici
       { name: "Aversa Rent Car - Noleggio Auto e Furgoni", category: "rental", street: "Viale Olimpico, Aversa" },
       { name: "Hertz Rent Point Aversa", category: "rental", street: "Via Kennedy, Aversa" },
       { name: "Maggiore / Avis Car Rental", category: "rental", street: "Via Europa, Aversa" },
       { name: "Noleggio Auto Elettriche e Scooter", category: "rental", street: "Via di Jasi, Aversa" },
       { name: "AutoNoleggio Normanno", category: "rental", street: "Via Diaz, Aversa" },
-
-      // Pizzerie, Bar, Pasticcerie e Ristoranti
       { name: "Pasticceria Mungiguerra (Polacca Aversana)", category: "food", street: "Via di Jasi, Aversa" },
       { name: "Pizzeria Carlo Sammarco 2.0", category: "food", street: "Via Gramsci, Aversa" },
       { name: "Pizzeria Unica Aversa", category: "food", street: "Via S. Nicandro, Aversa" },
@@ -210,8 +202,6 @@
       { name: "Braceria Napoletana Aversa", category: "food", street: "Via Roma, Aversa" },
       { name: "Gelateria Artigianale Polo Nord", category: "food", street: "Via San Lorenzo, Aversa" },
       { name: "Pub Guinness Aversa", category: "food", street: "Via Gramsci, Aversa" },
-
-      // Scuole e Università
       { name: "Dipartimento di Architettura Unicampania", category: "school", street: "Via San Lorenzo, Aversa" },
       { name: "Dipartimento di Ingegneria Unicampania", category: "school", street: "Via Roma, Aversa" },
       { name: "Liceo Scientifico Enrico Fermi", category: "school", street: "Via S. Lorenzo, Aversa" },
@@ -220,16 +210,12 @@
       { name: "Scuola Media Domenico Cimarosa", category: "school", street: "Via G. Siani, Aversa" },
       { name: "Istituto Magistrale Jommelli", category: "school", street: "Via Kennedy, Aversa" },
       { name: "Scuola Elementare Parente", category: "school", street: "Via Roma, Aversa" },
-
-      // Hotel e Alloggi
       { name: "Hotel Genovese Aversa", category: "hotel", street: "Piazza Mazzini, Aversa" },
       { name: "B&B Aversa Centro Storico", category: "hotel", street: "Via Garibaldi, Aversa" },
       { name: "Residenza Normanna Bed & Breakfast", category: "hotel", street: "Via Segno, Aversa" },
       { name: "Hotel Royal Aversa", category: "hotel", street: "Via S. Lorenzo, Aversa" },
       { name: "B&B Domus Aversa", category: "hotel", street: "Via Roma, Aversa" },
       { name: "Affittacamere La Dimora Normanna", category: "hotel", street: "Via Diaz, Aversa" },
-
-      // Farmacie, Supermercati, Banche e Servizi
       { name: "Farmacia Centrale Aversa", category: "services", street: "Via Roma, Aversa" },
       { name: "Farmacia San Lorenzo", category: "services", street: "Via S. Lorenzo, Aversa" },
       { name: "Farmacia Comunale Aversa", category: "services", street: "Via Kennedy, Aversa" },
@@ -329,7 +315,7 @@
       document.getElementById('modal-view').style.display = 'none';
     }
 
-    // Caricamento Immediato
+    // Caricamento immediato all'avvio
     renderPlaces(masterAversaPlaces);
   </script>
 </body>
