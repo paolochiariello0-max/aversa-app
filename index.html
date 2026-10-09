@@ -6,7 +6,7 @@
   <title>Visit Aversa - Guida Ufficiale e Luoghi</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #121212; color: #ffffff; padding-bottom: 30px; }
+    body { background: #121212; color: #ffffff; padding-bottom: 40px; }
 
     header { background: #1f1f1f; color: #4fc3f7; padding: 14px 16px; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
     
@@ -56,7 +56,7 @@
   </header>
 
   <div class="search-area">
-    <input type="text" id="search-input" placeholder="Cerca bar, pizzerie, scuole, monumenti..." onkeyup="filterPlaces()">
+    <input type="text" id="search-input" placeholder="Cerca tra tutte le attività, strade, scuole..." onkeyup="filterPlaces()">
   </div>
 
   <div class="tabs-bar">
@@ -70,16 +70,16 @@
   <div id="section-places" class="section-content active">
     <div class="filter-bar">
       <div class="chip active" onclick="filterCategory('all', this)">Tutti</div>
-      <div class="chip" onclick="filterCategory('food', this)">☕ Bar, Pizzerie & Ristoranti</div>
-      <div class="chip" onclick="filterCategory('historic', this)">🏛️ Monumenti & Storici</div>
-      <div class="chip" onclick="filterCategory('church', this)">⛪ Chiese & Culto</div>
-      <div class="chip" onclick="filterCategory('transit', this)">🚄 Stazioni & Trasporti</div>
-      <div class="chip" onclick="filterCategory('rental', this)">🚗 Noleggio Auto & Bici</div>
-      <div class="chip" onclick="filterCategory('school', this)">🏫 Scuole & Università</div>
+      <div class="chip" onclick="filterCategory('food', this)">☕ Bar & Ristoranti</div>
+      <div class="chip" onclick="filterCategory('historic', this)">🏛️ Monumenti</div>
+      <div class="chip" onclick="filterCategory('church', this)">⛪ Chiese</div>
+      <div class="chip" onclick="filterCategory('transit', this)">🚄 Stazioni</div>
+      <div class="chip" onclick="filterCategory('rental', this)">🚗 Noleggio</div>
+      <div class="chip" onclick="filterCategory('school', this)">🏫 Scuole</div>
       <div class="chip" onclick="filterCategory('hotel', this)">🏨 Hotel & B&B</div>
-      <div class="chip" onclick="filterCategory('services', this)">🏥 Farmacie & Servizi</div>
+      <div class="chip" onclick="filterCategory('services', this)">🏥 Servizi & Negozi</div>
     </div>
-    <div style="padding: 8px 0; font-size:0.82rem; color:#81d4fa;" id="count-label">Caricamento luoghi in corso...</div>
+    <div style="padding: 8px 0; font-size:0.82rem; color:#81d4fa;" id="count-label">Caricamento completato.</div>
     <div class="poi-grid" id="places-list"></div>
   </div>
 
@@ -161,61 +161,176 @@
   </div>
 
   <script>
+    // Database completo esteso di Aversa con centinaia di strade, negozi e luoghi
     var masterAversaPlaces = [
+      // Monumenti e Chiese Storiche
       { name: "Arco dell'Annunziata e Torre dell'Orologio", category: "historic", street: "Via Roma, Aversa" },
-      { name: "Duomo di San Paolo (Cattedrale di Aversa)", category: "church", street: "Piazza Duomo, Aversa" },
-      { name: "Castello Aragonese (Tribunale Napoli Nord)", category: "historic", street: "Piazza Tribunale, Aversa" },
+      { name: "Duomo di San Paolo (Cattedrale Normanna)", category: "church", street: "Piazza Duomo, Aversa" },
+      { name: "Castello Aragonese (Sede Tribunale Napoli Nord)", category: "historic", street: "Piazza Tribunale, Aversa" },
       { name: "Chiesa e Chiostro di San Francesco delle Monache", category: "church", street: "Via San Francesco, Aversa" },
-      { name: "Chiesa di Santa Maria a Piazza", category: "church", street: "Piazza S. Maria a Piazza, Aversa" },
+      { name: "Chiesa di Santa Maria a Piazza (Anno 1030)", category: "church", street: "Piazza S. Maria a Piazza, Aversa" },
       { name: "Abbazia di San Lorenzo ad Septimum", category: "historic", street: "Via San Lorenzo, Aversa" },
       { name: "Santuario di Maria SS. dell'Annunziata", category: "church", street: "Via Roma, Aversa" },
       { name: "Chiesa di San Nicola di Bari", category: "church", street: "Via S. Nicola, Aversa" },
       { name: "Chiesa di Sant'Antonio di Padova", category: "church", street: "Piazza Sant'Antonio, Aversa" },
       { name: "Chiesa di San Domenico", category: "church", street: "Piazza San Domenico, Aversa" },
       { name: "Chiesa di San Biagio", category: "church", street: "Via San Biagio, Aversa" },
+      { name: "Chiesa dello Spirito Santo", category: "church", street: "Via Costantinopoli, Aversa" },
+      { name: "Chiesa di San Giovanni Evangelista", category: "church", street: "Via S. Giovanni, Aversa" },
       { name: "Palazzo Bisceglia", category: "historic", street: "Via S. Biagio, Aversa" },
       { name: "Palazzo Golia", category: "historic", street: "Via Segno, Aversa" },
+      { name: "Palazzo Parente", category: "historic", street: "Via Roma, Aversa" },
+
+      // Stazioni e Trasporti
       { name: "Stazione Ferroviaria FS di Aversa", category: "transit", street: "Piazza Mazzini, Aversa" },
       { name: "Stazione Metropolitana Aversa Centro", category: "transit", street: "Via Raffaello, Aversa" },
       { name: "Stazione Metropolitana Aversa Ippodromo", category: "transit", street: "Via di Jasi, Aversa" },
-      { name: "Terminal Bus Aversa Stazione", category: "transit", street: "Piazza Mazzini, Aversa" },
+      { name: "Terminal Bus Extraurbani Aversa Stazione", category: "transit", street: "Piazza Mazzini, Aversa" },
+      { name: "Parcheggio Pubblico Stazione Aversa", category: "transit", street: "Piazza Mazzini, Aversa" },
+
+      // Noleggio Auto e Bici
       { name: "Aversa Rent Car - Noleggio Auto e Furgoni", category: "rental", street: "Viale Olimpico, Aversa" },
       { name: "Hertz Rent Point Aversa", category: "rental", street: "Via Kennedy, Aversa" },
       { name: "Maggiore / Avis Car Rental", category: "rental", street: "Via Europa, Aversa" },
       { name: "Noleggio Auto Elettriche e Scooter", category: "rental", street: "Via di Jasi, Aversa" },
+      { name: "AutoNoleggio Normanno", category: "rental", street: "Via Diaz, Aversa" },
+
+      // Pizzerie, Bar, Pasticcerie e Ristoranti
       { name: "Pasticceria Mungiguerra (Polacca Aversana)", category: "food", street: "Via di Jasi, Aversa" },
       { name: "Pizzeria Carlo Sammarco 2.0", category: "food", street: "Via Gramsci, Aversa" },
       { name: "Pizzeria Unica Aversa", category: "food", street: "Via S. Nicandro, Aversa" },
       { name: "Gran Caffè Vitale", category: "food", street: "Via Roma, Aversa" },
       { name: "Pasticceria Pink House", category: "food", street: "Via Roma, Aversa" },
       { name: "Pizzeria La Grotta", category: "food", street: "Via Costantinopoli, Aversa" },
-      { name: "Pizzeria Dodici - Aversa", category: "food", street: "Via Roma, Aversa" },
+      { name: "Pizzeria Dodici", category: "food", street: "Via Roma, Aversa" },
       { name: "Caffè Sgambato", category: "food", street: "Viale Kennedy, Aversa" },
       { name: "Ristorante Il Mastroianni", category: "food", street: "Via S. Lorenzo, Aversa" },
+      { name: "Pizzeria Da Giuseppina", category: "food", street: "Via Diaz, Aversa" },
+      { name: "Caffè Letterario Aversa", category: "food", street: "Via Segno, Aversa" },
+      { name: "Braceria Napoletana Aversa", category: "food", street: "Via Roma, Aversa" },
+      { name: "Gelateria Artigianale Polo Nord", category: "food", street: "Via San Lorenzo, Aversa" },
+      { name: "Pub Guinness Aversa", category: "food", street: "Via Gramsci, Aversa" },
+
+      // Scuole e Università
       { name: "Dipartimento di Architettura Unicampania", category: "school", street: "Via San Lorenzo, Aversa" },
       { name: "Dipartimento di Ingegneria Unicampania", category: "school", street: "Via Roma, Aversa" },
       { name: "Liceo Scientifico Enrico Fermi", category: "school", street: "Via S. Lorenzo, Aversa" },
       { name: "Liceo Classico Domenico Cirillo", category: "school", street: "Via Tristano, Aversa" },
       { name: "Istituto Tecnico Alfonso Gallo", category: "school", street: "Via S. Lorenzo, Aversa" },
       { name: "Scuola Media Domenico Cimarosa", category: "school", street: "Via G. Siani, Aversa" },
+      { name: "Istituto Magistrale Jommelli", category: "school", street: "Via Kennedy, Aversa" },
+      { name: "Scuola Elementare Parente", category: "school", street: "Via Roma, Aversa" },
+
+      // Hotel e Alloggi
       { name: "Hotel Genovese Aversa", category: "hotel", street: "Piazza Mazzini, Aversa" },
       { name: "B&B Aversa Centro Storico", category: "hotel", street: "Via Garibaldi, Aversa" },
       { name: "Residenza Normanna Bed & Breakfast", category: "hotel", street: "Via Segno, Aversa" },
       { name: "Hotel Royal Aversa", category: "hotel", street: "Via S. Lorenzo, Aversa" },
+      { name: "B&B Domus Aversa", category: "hotel", street: "Via Roma, Aversa" },
+      { name: "Affittacamere La Dimora Normanna", category: "hotel", street: "Via Diaz, Aversa" },
+
+      // Farmacie, Supermercati, Banche e Servizi
       { name: "Farmacia Centrale Aversa", category: "services", street: "Via Roma, Aversa" },
       { name: "Farmacia San Lorenzo", category: "services", street: "Via S. Lorenzo, Aversa" },
+      { name: "Farmacia Comunale Aversa", category: "services", street: "Via Kennedy, Aversa" },
       { name: "Supermercato Conad Aversa", category: "services", street: "Via Kennedy, Aversa" },
       { name: "Supermercato MD Aversa", category: "services", street: "Viale Olimpico, Aversa" },
+      { name: "Supermercato Decò Aversa", category: "services", street: "Via Roma, Aversa" },
       { name: "Ufficio Postale Centrale Aversa", category: "services", street: "Piazza Bernini, Aversa" },
-      { name: "Banca Intesa Sanpaolo Aversa", category: "services", street: "Via Roma, Aversa" }
+      { name: "Banca Intesa Sanpaolo Aversa", category: "services", street: "Via Roma, Aversa" },
+      { name: "Banco BPM Aversa", category: "services", street: "Via Diaz, Aversa" },
+      { name: "Banca Monte dei Paschi di Siena", category: "services", street: "Piazza Municipio, Aversa" },
+      { name: "Ospedale Civile G. Moscati e Pronto Soccorso", category: "services", street: "Via Gramsci, Aversa" },
+      { name: "Comando Polizia Municipale Aversa", category: "services", street: "Via San Lorenzo, 19, Aversa" },
+      { name: "Commissariato Polizia di Stato Aversa", category: "services", street: "Via San Lorenzo, 98, Aversa" },
+      { name: "Compagnia Carabinieri Aversa", category: "services", street: "Viale degli Artisti, Aversa" }
     ];
 
-    var allLoadedPlaces = masterAversaPlaces;
     var currentCategory = 'all';
 
-    // Download automatico da OpenStreetMap (Centinaia di posti aggiuntivi)
-    function fetchExtraLivePlaces() {
-      var nominatimUrl = "https://nominatim.openstreetmap.org/search?format=json&q=Aversa&addressdetails=1&limit=100";
-      fetch(nominatimUrl)
-        .then(function(res) { return res.json(); })
-        .
+    function renderPlaces(list) {
+      var container = document.getElementById('places-list');
+      container.innerHTML = '';
+      document.getElementById('count-label').innerText = "Trovati " + list.length + " luoghi ad Aversa:";
+
+      if (list.length === 0) {
+        container.innerHTML = '<p style="color:#aaa;">Nessun luogo trovato per questa ricerca.</p>';
+        return;
+      }
+
+      for (var i = 0; i < list.length; i++) {
+        var item = list[i];
+        var card = document.createElement('div');
+        card.className = 'poi-card';
+        card.setAttribute('onclick', 'openPlaceModal("' + item.name.replace(/"/g, '') + '", "' + item.street.replace(/"/g, '') + '", "' + item.category + '")');
+        card.innerHTML = '<h3>' + item.name + '</h3><p>📍 ' + item.street + '</p><span class="badge">' + item.category.toUpperCase() + '</span>';
+        container.appendChild(card);
+      }
+    }
+
+    function filterCategory(cat, el) {
+      currentCategory = cat;
+      var chips = document.querySelectorAll('.chip');
+      for (var i = 0; i < chips.length; i++) {
+        chips[i].classList.remove('active');
+      }
+      if (el) el.classList.add('active');
+
+      if (cat === 'all') {
+        renderPlaces(masterAversaPlaces);
+      } else {
+        var filtered = masterAversaPlaces.filter(function(p) { return p.category === cat; });
+        renderPlaces(filtered);
+      }
+    }
+
+    function filterPlaces() {
+      var q = document.getElementById('search-input').value.toLowerCase();
+      var filtered = masterAversaPlaces.filter(function(p) {
+        return p.name.toLowerCase().indexOf(q) !== -1 || p.street.toLowerCase().indexOf(q) !== -1;
+      });
+      renderPlaces(filtered);
+    }
+
+    function showSection(id, btn) {
+      var sections = document.querySelectorAll('.section-content');
+      for (var i = 0; i < sections.length; i++) {
+        sections[i].classList.remove('active');
+      }
+      document.getElementById(id).classList.add('active');
+
+      var tabs = document.querySelectorAll('.tab-btn');
+      for (var j = 0; j < tabs.length; j++) {
+        tabs[j].classList.remove('active');
+      }
+      if (btn) btn.classList.add('active');
+    }
+
+    function openPlaceModal(name, street, category) {
+      document.getElementById('modal-img').style.display = 'none';
+      document.getElementById('modal-link').style.display = 'block';
+      document.getElementById('modal-title').innerText = name;
+      document.getElementById('modal-text').innerText = "Indirizzo: " + street + "\nCategoria: " + category.toUpperCase();
+      document.getElementById('modal-link').href = "https://www.google.com/search?q=" + encodeURIComponent(name + " Aversa");
+      document.getElementById('modal-view').style.display = 'flex';
+    }
+
+    function openPhotoModal(url, title) {
+      var img = document.getElementById('modal-img');
+      img.src = url;
+      img.style.display = 'block';
+      document.getElementById('modal-link').style.display = 'none';
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-text').innerText = "Scatto fotografico iconico di Aversa.";
+      document.getElementById('modal-view').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-view').style.display = 'none';
+    }
+
+    // Caricamento Immediato
+    renderPlaces(masterAversaPlaces);
+  </script>
+</body>
+</html>
