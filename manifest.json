@@ -1,17 +1,16 @@
 {
-  "name": "Aversa Smart App",
-  "short_name": "AversaApp",
-  "description": "App per la mappa interattiva e monitoraggio POI di Aversa",
-  "start_url": "./index.html",
+  "name": "Visit Aversa",
+  "short_name": "Aversa",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#003580",
+  "background_color": "#121212",
+  "theme_color": "#1f1f1f",
+  "description": "Guida ufficiale e mappa dei luoghi di Aversa",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Arco_dell%27Annunziata_Aversa.jpg/640px-Arco_dell%27Annunziata_Aversa.jpg",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/jpeg"
     }
   ]
 }
